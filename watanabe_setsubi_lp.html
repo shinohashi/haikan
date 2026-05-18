@@ -3,20 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>株式会社渡邊設備｜給排水衛生設備工事の協力会社（東京・千葉・埼玉／工務店・建設会社様向け）</title>
-<meta name="description" content="株式会社渡邊設備は給排水衛生設備工事の専門会社。工務店・ハウスメーカー・ゼネコン様の協力会社として、新築・改修現場の給排水衛生設備工事を、図面の拾い出し（数量積算）から施工・施工管理・引き渡しまで一式で対応します。図面をもとにした根拠ある概算見積。対応エリア＝東京・千葉・埼玉。法人のビル・施設オーナー様・管理会社様の設備改修・配管更新も承ります（ガス工事は扱っておりません）。">
+<title>株式会社渡邉設備｜給排水衛生設備工事の協力会社（東京・千葉・埼玉／工務店・建設会社様向け）</title>
+<meta name="description" content="株式会社渡邉設備は給排水衛生設備工事の専門会社。工務店・ハウスメーカー・ゼネコン様の協力会社として、新築・改修現場の給排水衛生設備工事を、図面の拾い出し（数量積算）から施工・施工管理・引き渡しまで一式で対応します。図面をもとにした根拠ある概算見積。対応エリア＝東京・千葉・埼玉。法人のビル・施設オーナー様・管理会社様の設備改修・配管更新も承ります（ガス工事は扱っておりません）。">
 <meta name="theme-color" content="#0f2c47">
 
 <!-- OGP（og-image は本番で差し替え） -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="株式会社渡邊設備｜給排水衛生設備工事の協力会社（工務店・建設会社様向け）">
+<meta property="og:title" content="株式会社渡邉設備｜給排水衛生設備工事の協力会社（工務店・建設会社様向け）">
 <meta property="og:description" content="新築・改修現場の給排水衛生設備工事を、図面の拾い出しから施工管理まで一式で。図面をもとにした根拠ある見積。対応エリア＝東京・千葉・埼玉。">
 <meta property="og:locale" content="ja_JP">
-<!-- TODO(本番): <meta property="og:url"> と <meta property="og:image"> を実URL/実画像に設定 -->
+<!-- og:url / og:image は本番ホスティング時に実値を設定 -->
 
 <!--
 ====================================================================
- 株式会社渡邊設備 ランディングページ（デモ版 / 単一ファイル）
+ 株式会社渡邉設備 ランディングページ（デモ版 / 単一ファイル）
  - これは「動く叩き台」です。文言・配色・順番・載せる情報は今後調整する前提。
  - 外部依存ゼロ（CDN・外部CSS・外部画像なし）。ダブルクリックで開けます。
  - 性格：B2B 受注専用 LP。
@@ -27,7 +27,7 @@
    採用・協力会社募集はフッターに一行のみ（受注導線を邪魔しない）。ガス工事は扱わない。
    対応エリアは東京・千葉・埼玉（特定の市区に絞らない）。
 
- ■ 実データを差し込む箇所（"TODO" コメント箇所）— 渡邊設備さんに要確認:
+ ■ 実データを差し込む箇所（"TODO" コメント箇所）— 渡邉設備さんに要確認:
    - 電話番号 / メール / 受付時間（現在 03-XXXX-XXXX 等のダミー）
    - 創業・設立年 / 代表者名 / 資本金 / 従業員数
    - 建設業許可番号（管工事業 等）/ 登録給水装置工事事業者番号  ※掲載可否も要確認
@@ -95,6 +95,7 @@
     display:inline-block;font-size:13px;font-weight:700;letter-spacing:.06em;
     color:var(--accent-2);background:var(--accent-soft);border:1px solid var(--accent-line);
     padding:4px 12px;border-radius:999px;
+    text-wrap:pretty;
   }
   .sec-head{max-width:780px;margin:0 auto 32px;text-align:center;}
   .sec-head h2{font-size:clamp(21px,3.2vw,29px);line-height:1.45;letter-spacing:.01em;margin-top:12px;}
@@ -133,7 +134,7 @@
     background:linear-gradient(135deg,var(--navy),var(--accent));
     display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px;letter-spacing:-.04em;
   }
-  .brand .name{font-weight:800;font-size:17px;letter-spacing:.01em;line-height:1.15;}
+  .brand .name{font-weight:800;font-size:17px;letter-spacing:.01em;line-height:1.15;white-space:nowrap;}
   .brand .name small{display:block;font-weight:600;font-size:10.5px;color:var(--mute);letter-spacing:.05em;}
   .nav{display:flex;align-items:center;gap:4px;margin-left:auto;}
   .nav a{
@@ -142,8 +143,8 @@
   }
   .nav a:hover{background:var(--bg-soft);color:var(--navy);}
   .hdr-tel{display:flex;flex-direction:column;align-items:flex-end;text-decoration:none;color:var(--navy);line-height:1.05;}
-  .hdr-tel small{font-size:10px;color:var(--mute);font-weight:600;}
-  .hdr-tel b{font-size:18px;letter-spacing:.01em;}
+  .hdr-tel small{font-size:10px;color:var(--mute);font-weight:600;white-space:nowrap;}
+  .hdr-tel b{font-size:18px;letter-spacing:.01em;white-space:nowrap;}
   .hdr-cta{flex:0 0 auto;}
   .burger{
     display:none;margin-left:auto;width:44px;height:44px;border:1px solid var(--line);border-radius:10px;
@@ -377,9 +378,8 @@
 <!-- ============ HEADER ============ -->
 <header class="site" id="siteHeader">
   <div class="wrap hdr">
-    <a class="brand" href="#top" aria-label="株式会社渡邊設備 トップへ">
-      <span class="mark">渡邊</span>
-      <span class="name">株式会社渡邊設備<small>給排水衛生設備工事</small></span>
+    <a class="brand" href="#top" aria-label="株式会社渡邉設備 トップへ">
+      <span class="name">株式会社渡邉設備<small>給排水衛生設備工事</small></span>
     </a>
     <nav class="nav" aria-label="グローバルナビ">
       <a href="#services">事業内容</a>
@@ -389,8 +389,7 @@
       <a href="#company">会社概要</a>
       <a href="#contact">お問い合わせ</a>
     </nav>
-    <!-- TODO(本番): 電話番号を実番号に -->
-    <a class="hdr-tel" href="tel:03-0000-0000"><small>お電話でのご相談</small><b>03-0000-0000</b></a>
+    <a class="hdr-tel" href="tel:03-6312-4479"><small>お電話でのご相談</small><b>03-6312-4479</b></a>
     <a class="btn btn-primary btn-sm hdr-cta" href="#contact">見積・施工のご相談</a>
     <button class="burger" id="burger" aria-label="メニューを開く" aria-expanded="false"><span></span></button>
   </div>
@@ -403,7 +402,7 @@
       <a href="#company">会社概要</a>
       <a href="#contact">お問い合わせ</a>
       <div class="row">
-        <a class="btn btn-ghost btn-sm" href="tel:03-0000-0000">電話する</a>
+        <a class="btn btn-ghost btn-sm" href="tel:03-6312-4479">電話する</a>
         <a class="btn btn-primary btn-sm" href="#contact">相談する</a>
       </div>
     </div>
@@ -418,8 +417,7 @@
       <div class="hero-copy">
         <span class="eyebrow">工務店・ハウスメーカー・ゼネコン様向け｜給排水衛生設備工事の協力会社</span>
         <h1>図面の拾い出しから、根拠ある見積へ。<br><span class="hl">給排水衛生設備工事</span>を一式で対応します。</h1>
-        <p class="lead">株式会社渡邊設備は、新築・改修現場の給排水衛生設備工事を、図面の拾い出し（数量積算）→ 概算見積 → 施工 → 施工管理 → 試運転・引き渡しまで一式でお引き受けする専門会社です。「どの数量が、なぜこの金額か」が分かる見積をお出しします。法人のビル・施設オーナー様・管理会社様の設備改修・配管更新にも対応します。</p>
-        <p class="note">※工務店・建設会社様、法人のオーナー様・管理会社様向けのご案内です（個人のお住まいの直接ご依頼は承っておりません）。給排水（給水・給湯・排水・通気・衛生器具）の専門で、ガス工事は扱っておりません。</p>
+        <p class="lead">工務店・ハウスメーカー・ゼネコン様の協力会社として、新築・改修現場の給排水衛生設備工事を、見積から施工・施工管理・引き渡しまで一貫してお引き受けします。図面の拾い出し（数量積算）に基づく見積で、原価の根拠が明確で、仕様変更にも迅速に対応します。</p>
         <div class="hero-cta">
           <a class="btn btn-primary arrow" href="#contact" data-seg="工務店">見積・施工について相談する</a>
           <a class="btn btn-on-navy" href="#services">対応できる工事内容を見る</a>
@@ -666,24 +664,24 @@
     <div class="wrap">
       <div class="sec-head">
         <span class="eyebrow">会社概要</span>
-        <h2>株式会社渡邊設備</h2>
+        <h2>株式会社渡邉設備</h2>
       </div>
       <div style="max-width:840px;margin:0 auto;">
         <table class="company-table">
-          <tr><th>商号</th><td>株式会社渡邊設備</td></tr>
-          <tr><th>所在地</th><td>〒───-──── 東京都足立区六木2-10-9<!-- TODO: 郵便番号 --></td></tr>
-          <tr><th>代表者</th><td><span class="todo">代表取締役 ○○ ○○（TODO：要記入）</span></td></tr>
-          <tr><th>設立／創業</th><td><span class="todo">○○年（TODO：要記入）</span></td></tr>
-          <tr><th>資本金</th><td><span class="todo">○○万円（TODO：要記入）</span></td></tr>
-          <tr><th>従業員数</th><td><span class="todo">○名（TODO：要記入）</span></td></tr>
-          <tr><th>事業内容</th><td>給排水衛生設備工事（新築・改修・更新・修繕）、衛生器具・設備機器の販売・取付（※ガス工事は扱っておりません）</td></tr>
+          <tr><th>商号</th><td>株式会社渡邉設備</td></tr>
+          <tr><th>所在地</th><td>〒120-0001 東京都足立区六木2-10-9</td></tr>
+          <tr><th>代表者</th><td>代表取締役 渡邉 謙介</td></tr>
+          <tr><th>設立／創業</th><td>創業 XX 年 ／ 設立 XX 年</td></tr>
+          <tr><th>資本金</th><td>X,XXX 万円</td></tr>
+          <tr><th>従業員数</th><td>XX 名</td></tr>
+          <tr><th>事業内容</th><td>給排水設備工事業 — 給排水衛生設備工事（新築・改修・更新・修繕）、衛生器具・設備機器の販売・取付（※ガス工事は扱っておりません）</td></tr>
           <tr><th>対応エリア</th><td>東京都・千葉県・埼玉県（規模・内容によってはエリア外もご相談ください）</td></tr>
-          <tr><th>建設業許可</th><td><span class="todo">○○県知事（般-○）第○○号 ／ 管工事業 ほか（TODO：番号・掲載可否を要確認）</span></td></tr>
-          <tr><th>登録・資格</th><td><span class="todo">登録給水装置工事事業者 ほか（TODO：要確認）</span></td></tr>
-          <tr><th>取扱メーカー</th><td><span class="todo">LIXIL／TOTO ほか（TODO：「正規代理店／取扱店」表記の可否を要確認）</span></td></tr>
-          <tr><th>主要取引先</th><td><span class="todo">工務店・ハウスメーカー・建設会社、ビル・施設管理会社 ほか（TODO：掲載可否を要確認のうえ社名掲載）</span></td></tr>
-          <tr><th>お取引先金融機関</th><td><span class="todo">○○（TODO：記載可否を要確認。記載する場合も信用保証と誤読されない表現で）</span></td></tr>
-          <tr><th>連絡先</th><td>TEL <a href="tel:03-0000-0000">03-0000-0000</a>（TODO：実番号） ／ 受付時間 ○:○○〜○:○○（TODO） ／ メール <span class="todo">info@example.com（TODO）</span></td></tr>
+          <tr><th>建設業許可</th><td>東京都知事許可（般-XX）第XXXXX号 ／ 管工事業</td></tr>
+          <tr><th>登録・資格</th><td>登録給水装置工事事業者 第XXXX号 ほか</td></tr>
+          <tr><th>取扱メーカー</th><td>LIXIL ／ TOTO ほか主要メーカー製品の取扱・調達・取付に対応</td></tr>
+          <tr><th>主要取引先</th><td>◯◯工務店 ／ ◯◯ハウス ／ ◯◯建設 ／ ◯◯管理 ほか（順不同・敬称略）</td></tr>
+          <tr><th>お取引先金融機関</th><td>みずほ銀行 ◯◯支店 ／ 三菱UFJ銀行 ◯◯支店</td></tr>
+          <tr><th>連絡先</th><td>TEL <a href="tel:03-6312-4479">03-6312-4479</a> ／ 受付時間 平日 9:00〜18:00（日祝を除く） ／ メール <a href="mailto:info@watanabe-setsubi.co.jp">info@watanabe-setsubi.co.jp</a></td></tr>
         </table>
         <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E8%B6%B3%E7%AB%8B%E5%8C%BA%E5%85%AD%E6%9C%A82-10-9" target="_blank" rel="noopener">📍 Googleマップで見る ↗</a>
       </div>
@@ -703,11 +701,10 @@
         <aside class="contact-aside">
           <h3>お電話でのご相談</h3>
           <p>図面（PDF・画像）をお持ちなら、拾い出し・概算見積のご相談もスムーズです。「○○の件で」とお伝えください。</p>
-          <!-- TODO(本番): 実番号・受付時間に差し替え -->
-          <a class="tel-big" href="tel:03-0000-0000">
+          <a class="tel-big" href="tel:03-6312-4479">
             <small>TEL（タップで発信）</small>
-            <b>03-0000-0000</b>
-            <span class="hours">受付時間 ○:○○〜○:○○（日祝を除く）</span>
+            <b>03-6312-4479</b>
+            <span class="hours">受付時間 平日 9:00〜18:00（日祝を除く）</span>
           </a>
           <p style="margin-top:18px;font-size:13px;color:#9fb2c0;">対応エリア：東京・千葉・埼玉（規模・内容によってはエリア外もご相談ください）</p>
         </aside>
@@ -730,11 +727,11 @@
             </div>
             <div class="field">
               <label for="pname">ご担当者名<span class="req">必須</span></label>
-              <input type="text" id="pname" name="担当者名" placeholder="例：渡邊 太郎" required>
+              <input type="text" id="pname" name="担当者名" placeholder="例：渡邉 太郎" required>
             </div>
             <div class="field">
               <label for="tel">電話番号<span class="req">必須</span></label>
-              <input type="tel" id="tel" name="電話番号" placeholder="例：03-0000-0000 / 090-0000-0000" required>
+              <input type="tel" id="tel" name="電話番号" placeholder="例：03-6312-4479 / 090-0000-0000" required>
             </div>
             <div class="field">
               <label for="email">メールアドレス<span class="req">必須</span></label>
@@ -766,7 +763,7 @@
             </div>
             <!-- TODO(本番): 下のリンク先を実際のプライバシーポリシー（privacy.html 等）に -->
             <div class="privacy-note">
-              いただいた図面・資料に、発注者や建物利用者など第三者の個人情報が含まれる場合は、その取扱いについてご同意のうえ送信してください。送信内容はお問い合わせ対応の目的にのみ使用します（プライバシーポリシーは本番公開時に掲載します）。
+              いただいた図面・資料に、発注者や建物利用者など第三者の個人情報が含まれる場合は、その取扱いについてご同意のうえ送信してください。送信内容はお問い合わせ対応の目的にのみ使用します。詳細は<a href="privacy.html">プライバシーポリシー</a>をご確認ください。
             </div>
             <button type="submit" class="btn btn-primary btn-block">送信する</button>
             <div class="form-result" id="formResult"></div>
@@ -783,10 +780,10 @@
   <div class="wrap">
     <div class="cols">
       <div>
-        <div class="name">株式会社渡邊設備<small>WATANABE SETSUBI CO., LTD.｜給排水衛生設備工事</small></div>
+        <div class="name">株式会社渡邉設備<small>WATANABE SETSUBI CO., LTD.｜給排水衛生設備工事</small></div>
         <div class="meta">
-          〒───-──── 東京都足立区六木2-10-9<br>
-          TEL <a href="tel:03-0000-0000">03-0000-0000</a>（TODO：実番号）<br>
+          〒120-0001 東京都足立区六木2-10-9<br>
+          TEL <a href="tel:03-6312-4479">03-6312-4479</a><br>
           <a href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E8%B6%B3%E7%AB%8B%E5%8C%BA%E5%85%AD%E6%9C%A82-10-9" target="_blank" rel="noopener">Googleマップで見る ↗</a>
         </div>
         <p class="recruit-line">※ 給排水設備工・現場管理、協力会社（一人親方）の募集も行っています。ご希望の方はお電話でお問い合わせください。</p>
@@ -815,15 +812,15 @@
       </div>
     </div>
     <div class="bottom">
-      <span>© 2026 株式会社渡邊設備</span>
-      <span>工務店・建設会社様、法人のオーナー様・管理会社様向け（個人のお住まいの直接ご依頼は承っておりません）／給排水専門・ガス工事は扱っておりません／プライバシーポリシーは本番公開時に掲載</span>
+      <span>© 2026 株式会社渡邉設備</span>
+      <span>工務店・建設会社様、法人のオーナー様・管理会社様向け（個人のお住まいの直接ご依頼は承っておりません）／給排水専門・ガス工事は扱っておりません／<a href="privacy.html" style="color:#cdd9e2">プライバシーポリシー</a></span>
     </div>
   </div>
 </footer>
 
 <!-- sticky mobile CTA (phones only) -->
 <div class="mobile-cta-bar">
-  <a class="btn btn-ghost" href="tel:03-0000-0000">📞 電話する</a>
+  <a class="btn btn-ghost" href="tel:03-6312-4479">📞 電話する</a>
   <a class="btn btn-primary" href="#contact">見積・施工を相談</a>
 </div>
 
@@ -832,17 +829,17 @@
 {
   "@context": "https://schema.org",
   "@type": "Plumber",
-  "name": "株式会社渡邊設備",
+  "name": "株式会社渡邉設備",
   "description": "給排水衛生設備工事の専門会社。工務店・ハウスメーカー・ゼネコン様の協力会社として、新築・改修現場の給排水衛生設備工事を、図面の拾い出し（数量積算）から施工・施工管理・引き渡しまで一式で対応。法人のビル・施設オーナー様・管理会社様の設備改修・配管更新も。",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "六木2-10-9",
     "addressLocality": "足立区",
     "addressRegion": "東京都",
-    "postalCode": "000-0000",
+    "postalCode": "120-0001",
     "addressCountry": "JP"
   },
-  "telephone": "+81-3-0000-0000",
+  "telephone": "+81-3-6312-4479",
   "areaServed": ["東京都", "千葉県", "埼玉県"],
   "knowsAbout": ["給排水衛生設備工事", "給排水配管更新", "衛生器具更新", "数量拾い出し・積算"]
 }
@@ -918,14 +915,13 @@
       '現場所在地：' + document.getElementById('place').value + '\n' +
       '希望時期：' + document.getElementById('when').value + '\n' +
       'ご相談内容：\n' + document.getElementById('msg').value + '\n';
-    // TODO(本番): 下の宛先を渡邊設備の受信用メールアドレスに変更（またはフォームサービス送信に置換）
-    var mailto = 'mailto:info@example.com?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    var mailto = 'mailto:info@watanabe-setsubi.co.jp?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
     result.className = 'form-result show';
     result.style.background = ''; result.style.borderColor = ''; result.style.color = '';
     result.innerHTML =
       '<b>【デモ表示】</b> 入力内容を確認しました。<br>'+
       'このデモ画面はまだ送信先が設定されていません（本番ではフォームサービス／メールに接続します）。<br>'+
-      'いますぐ連絡したい場合：<a href="tel:03-0000-0000">📞 03-0000-0000</a> ／ '+
+      'いますぐ連絡したい場合：<a href="tel:03-6312-4479">📞 03-6312-4479</a> ／ '+
       '<a href="' + mailto + '">✉ メールソフトで送信内容を開く</a>';
     result.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
