@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>株式会社渡邉設備｜給排水衛生設備工事の協力会社（関東一円／ゼネコン・サブコン様向け）</title>
+<meta name="description" content="株式会社渡邉設備は給排水衛生設備工事の専門会社。ゼネコン・サブコン様の協力会社として、新築・改修現場の給排水衛生設備工事を、図面の拾い出し（数量積算）から施工・施工管理・引き渡しまで一式で対応します。図面をもとにした根拠ある概算見積。対応エリア＝関東一円（東京・神奈川・千葉・埼玉・茨城・栃木・群馬）、それ以外はご相談ください。法人のビル・施設オーナー様・管理会社様の設備改修・配管更新も承ります（ガス工事は扱っておりません）。">
+<meta name="theme-color" content="#0f2c47">
+
+<!-- OGP（og-image は本番で差し替え） -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="株式会社渡邉設備｜給排水衛生設備工事の協力会社（ゼネコン・サブコン様向け）">
+<meta property="og:description" content="新築・改修現場の給排水衛生設備工事を、図面の拾い出しから施工管理まで一式で。図面をもとにした根拠ある見積。対応エリア＝関東一円（東京・神奈川・千葉・埼玉・茨城・栃木・群馬）。">
+<meta property="og:locale" content="ja_JP">
+<!-- og:url / og:image は本番ホスティング時に実値を設定 -->
+
+<!--
+====================================================================
+ 株式会社渡邉設備 ランディングページ（デモ版 / 単一ファイル）
+ - これは「動く叩き台」です。文言・配色・順番・載せる情報は今後調整する前提。
+ - 外部依存ゼロ（CDN・外部CSS・外部画像なし）。ダブルクリックで開けます。
+ - 性格：B2B 受注専用 LP。
+     主ターゲット＝ゼネコン・サブコン専業（積算・施工管理ご担当者）。
+     次点＝法人のビル・施設オーナー／管理会社（設備改修・配管更新）。
+     個人のお住まいの直接ご依頼は対象外（お問い合わせ欄に明記）。
+   主軸メッセージ＝「図面の拾い出しに基づく、根拠ある明瞭な見積」＋「給排水衛生設備工事を一式で対応」。
+   採用・協力会社募集はフッターに一行のみ（受注導線を邪魔しない）。ガス工事は扱わない。
+   対応エリアは関東一円（東京・神奈川・千葉・埼玉・茨城・栃木・群馬）、それ以外はご相談。
+
+ ■ 実データを差し込む箇所（"TODO" コメント箇所）— 渡邉設備さんに要確認:
+   - 電話番号 / メール / 受付時間（現在 03-XXXX-XXXX 等のダミー）
+   - 創業・設立年 / 代表者名 / 資本金 / 従業員数
+   - 建設業許可番号（管工事業 等）/ 登録給水装置工事事業者番号  ※掲載可否も要確認
+   - 取扱メーカー（LIXIL / TOTO 等）と「正規代理店／取扱店」表記の正確な可否
+   - 施工実績の写真・物件種別・概要  ※発注者／元請の掲載許可を確認のうえ差し替え
+   - 対応エリアの注記（関東一円のうち実際に動ける範囲、それ以外は要相談）
+   - 主要取引先（ゼネコン・サブコン・管理会社）名の掲載可否
+   - 取引銀行の記載可否（記載する場合も信用保証と誤読されない控えめな表現で）
+   - ロゴデータ / コーポレートカラー指定の有無
+   - 「無料見積」「最短◯営業日」を出す場合の運用条件 → 本デモでは「図面確認後、概算見積に対応」表現
+
+ ■ 本番化メモ:
+   - フォームは現在「未接続」（送信するとデモ表示＋メールソフト起動の代替）。
+     本番では Tally / Formspree / Google フォーム等（図面・写真の添付に対応するもの）に接続し、
+     送信先メールとプライバシーポリシー（privacy.html）を用意する。
+   - 単一ファイルのままでも公開可。規模が大きくなったら style.css / script.js / assets/ に分割。
+   - Google ビジネスプロフィール（GBP）と NAP（社名・住所・電話）を完全一致させること。
+     GBP のウェブサイトURLにこのLPを設定し、流入計測用に UTM を付与する（plan の第4章参照）。
+====================================================================
+-->
+
+<style>
+  :root{
+    --navy:#0f2c47;
+    --navy-2:#0a2138;
+    --navy-3:#163a5a;
+    --ink:#172530;
+    --mute:#5d6e7b;
+    --line:#dde6ec;
+    --bg:#ffffff;
+    --bg-soft:#f2f7fa;
+    --bg-soft-2:#e9f1f5;
+    --accent:#0c7e8f;       /* 清潔感のある "水" の差し色 */
+    --accent-2:#0a6c7b;
+    --accent-soft:#e1f1f3;
+    --accent-line:#bfe0e4;
+    --warn-bg:#fff7ed;
+    --warn-line:#f3d9b8;
+    --warn-ink:#8a5a18;
+    --radius:14px;
+    --radius-sm:10px;
+    --shadow-sm:0 1px 3px rgba(15,44,71,.08), 0 1px 2px rgba(15,44,71,.06);
+    --shadow:0 10px 30px rgba(15,44,71,.10);
+    --maxw:1120px;
+    --hdr-h:64px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic UI","Meiryo",system-ui,-apple-system,"Segoe UI",sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+    line-height:1.75;
+    font-size:16px;
+    -webkit-text-size-adjust:100%;
+  }
+  img{max-width:100%;display:block;}
+  a{color:var(--accent-2);}
+  h1,h2,h3,h4,p,ul,ol,figure,table{margin:0;}
+  ul{padding-left:0;list-style:none;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px;}
+  section{scroll-margin-top:calc(var(--hdr-h) + 8px);}
+  .eyebrow{
+    display:inline-block;font-size:13px;font-weight:700;letter-spacing:.06em;
+    color:var(--accent-2);background:var(--accent-soft);border:1px solid var(--accent-line);
+    padding:4px 12px;border-radius:999px;
+    text-wrap:pretty;
+  }
+  .sec-head{max-width:780px;margin:0 auto 32px;text-align:center;}
+  .sec-head h2{font-size:clamp(21px,3.2vw,29px);line-height:1.45;letter-spacing:.01em;margin-top:12px;}
+  .sec-head p{color:var(--mute);margin-top:10px;font-size:15px;}
+  .pad{padding:64px 0;}
+  .pad-soft{background:var(--bg-soft);}
+
+  /* ---------- buttons ---------- */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    font-weight:700;font-size:15px;text-decoration:none;cursor:pointer;
+    border-radius:999px;padding:13px 24px;min-height:48px;border:2px solid transparent;
+    transition:transform .04s ease, box-shadow .15s ease, background .15s ease, color .15s ease;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--accent);color:#fff;box-shadow:0 6px 18px rgba(12,126,143,.28);}
+  .btn-primary:hover{background:var(--accent-2);}
+  .btn-ghost{background:#fff;color:var(--navy);border-color:var(--navy);}
+  .btn-ghost:hover{background:var(--navy);color:#fff;}
+  .btn-on-navy{background:#fff;color:var(--navy);}
+  .btn-on-navy:hover{background:var(--accent-soft);}
+  .btn-sm{padding:9px 16px;min-height:40px;font-size:14px;}
+  .btn-block{display:flex;width:100%;}
+  .arrow::after{content:"→";font-weight:700;}
+
+  /* ---------- header ---------- */
+  header.site{
+    position:sticky;top:0;z-index:50;background:rgba(255,255,255,.96);
+    backdrop-filter:saturate(160%) blur(6px);border-bottom:1px solid var(--line);
+  }
+  header.site.scrolled{box-shadow:var(--shadow-sm);}
+  .hdr{display:flex;align-items:center;gap:18px;height:var(--hdr-h);}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--navy);flex:0 0 auto;}
+  .brand .mark{
+    width:34px;height:34px;border-radius:8px;flex:0 0 auto;
+    background:linear-gradient(135deg,var(--navy),var(--accent));
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px;letter-spacing:-.04em;
+  }
+  .brand .name{font-weight:800;font-size:17px;letter-spacing:.01em;line-height:1.15;white-space:nowrap;}
+  .brand .name small{display:block;font-weight:600;font-size:10.5px;color:var(--mute);letter-spacing:.05em;}
+  .nav{display:flex;align-items:center;gap:4px;margin-left:auto;}
+  .nav a{
+    text-decoration:none;color:var(--ink);font-size:14px;font-weight:600;
+    padding:8px 10px;border-radius:8px;white-space:nowrap;
+  }
+  .nav a:hover{background:var(--bg-soft);color:var(--navy);}
+  .hdr-tel{display:flex;flex-direction:column;align-items:flex-end;text-decoration:none;color:var(--navy);line-height:1.05;}
+  .hdr-tel small{font-size:10px;color:var(--mute);font-weight:600;white-space:nowrap;}
+  .hdr-tel b{font-size:18px;letter-spacing:.01em;white-space:nowrap;}
+  .hdr-cta{flex:0 0 auto;}
+  .burger{
+    display:none;margin-left:auto;width:44px;height:44px;border:1px solid var(--line);border-radius:10px;
+    background:#fff;cursor:pointer;padding:0;align-items:center;justify-content:center;
+  }
+  .burger span,.burger span::before,.burger span::after{
+    content:"";display:block;width:20px;height:2px;background:var(--navy);border-radius:2px;position:relative;
+  }
+  .burger span::before{position:absolute;top:-6px;}
+  .burger span::after{position:absolute;top:6px;}
+  .mobile-nav{display:none;border-top:1px solid var(--line);background:#fff;}
+  .mobile-nav.open{display:block;}
+  .mobile-nav .wrap{padding:10px 20px 18px;}
+  .mobile-nav a{display:block;padding:11px 6px;text-decoration:none;color:var(--ink);font-weight:600;border-bottom:1px solid var(--line);}
+  .mobile-nav a:last-of-type{border-bottom:none;}
+  .mobile-nav .row{display:flex;gap:10px;margin-top:14px;}
+  .mobile-nav .row .btn{flex:1;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;overflow:hidden;color:#fff;
+    background:
+      radial-gradient(900px 500px at 88% -10%, rgba(12,126,143,.45), transparent 60%),
+      linear-gradient(160deg,var(--navy) 0%, var(--navy-2) 60%, #07182a 100%);
+  }
+  .hero::before{
+    content:"";position:absolute;inset:0;opacity:.16;pointer-events:none;
+    background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);
+    background-size:40px 40px;mask-image:radial-gradient(700px 420px at 80% 10%, #000, transparent 75%);
+  }
+  .hero .wrap{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:42px;align-items:center;padding-top:56px;padding-bottom:62px;}
+  .hero .eyebrow{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:#dff4f6;}
+  .hero h1{font-size:clamp(26px,4.1vw,40px);line-height:1.34;letter-spacing:.01em;margin:18px 0 14px;font-weight:800;}
+  .hero h1 .hl{color:#7ddbe5;}
+  .hero .lead{font-size:clamp(15px,1.7vw,17px);color:#cdd9e2;max-width:580px;}
+  .hero .note{margin-top:10px;font-size:12.5px;color:#9fb2c0;max-width:580px;}
+  .hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;}
+  .hero-sublinks{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px 22px;font-size:13.5px;}
+  .hero-sublinks a{color:#bfe8ec;text-decoration:none;border-bottom:1px solid rgba(191,232,236,.4);padding-bottom:1px;}
+  .hero-sublinks a:hover{color:#fff;border-color:#fff;}
+  .hero-stats{display:flex;flex-wrap:wrap;gap:10px 26px;margin-top:30px;padding-top:22px;border-top:1px solid rgba(255,255,255,.14);}
+  .hero-stats div{font-size:13px;color:#aebdc9;}
+  .hero-stats b{display:block;font-size:16px;color:#fff;font-weight:700;letter-spacing:.01em;}
+
+  /* hero visual: blueprint card + estimate card */
+  .hero-visual{position:relative;}
+  .blueprint{
+    background:linear-gradient(180deg,#0d2740,#0b2035);border:1px solid rgba(125,219,229,.28);border-radius:18px;
+    padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.35);
+  }
+  .blueprint .bp-top{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#8fc7cf;letter-spacing:.05em;margin-bottom:10px;}
+  .blueprint svg{width:100%;height:auto;display:block;border-radius:10px;background:
+    linear-gradient(rgba(125,219,229,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(125,219,229,.16) 1px,transparent 1px);
+    background-size:22px 22px;background-color:#0a1d31;}
+  .estimate-card{
+    position:absolute;right:-10px;bottom:-26px;width:250px;background:#fff;color:var(--ink);
+    border-radius:14px;box-shadow:var(--shadow);padding:14px 16px;border:1px solid var(--line);
+  }
+  .estimate-card h4{font-size:12px;color:var(--mute);font-weight:700;letter-spacing:.03em;display:flex;align-items:center;gap:6px;}
+  .estimate-card h4 .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);}
+  .estimate-card table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px;}
+  .estimate-card td{padding:4px 0;border-bottom:1px dashed var(--line);}
+  .estimate-card td:last-child{text-align:right;font-variant-numeric:tabular-nums;color:var(--navy);font-weight:700;}
+  .estimate-card .tot{display:flex;justify-content:space-between;margin-top:8px;font-size:13px;}
+  .estimate-card .tot b{color:var(--accent-2);font-size:15px;}
+  .estimate-card .cap{margin-top:6px;font-size:10.5px;color:var(--mute);}
+
+  /* ---------- generic cards ---------- */
+  .grid{display:grid;gap:18px;}
+  .g-4{grid-template-columns:repeat(4,1fr);}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm);}
+  .card h3{font-size:16.5px;line-height:1.45;}
+  .card p{color:var(--mute);font-size:14px;margin-top:8px;}
+  .tag-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;}
+  .tag{font-size:11.5px;color:var(--navy);background:var(--bg-soft-2);border-radius:6px;padding:3px 8px;font-weight:600;}
+  .card-no{font-size:12px;font-weight:800;color:var(--accent-2);letter-spacing:.07em;}
+  .ic{
+    width:42px;height:42px;border-radius:11px;background:var(--accent-soft);color:var(--accent-2);
+    display:grid;place-items:center;font-size:20px;margin-bottom:12px;border:1px solid var(--accent-line);
+  }
+
+  /* problems */
+  .prob-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .prob{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm);}
+  .prob h3{font-size:16px;color:var(--navy);display:flex;align-items:center;gap:9px;}
+  .prob h3 .pill{font-size:11px;font-weight:700;background:var(--navy);color:#fff;border-radius:999px;padding:3px 10px;}
+  .prob ul{margin-top:14px;display:grid;gap:9px;}
+  .prob li{position:relative;padding-left:24px;font-size:14.5px;color:var(--ink);}
+  .prob li::before{content:"";position:absolute;left:0;top:.62em;width:12px;height:12px;border-radius:3px;
+    background:var(--accent-soft);border:1.5px solid var(--accent);}
+  .prob li::after{content:"";position:absolute;left:3.5px;top:.74em;width:5px;height:9px;border:2px solid var(--accent-2);border-top:0;border-left:0;transform:rotate(40deg);}
+
+  /* why list */
+  .why{display:grid;gap:14px;}
+  .why .item{display:grid;grid-template-columns:auto 1fr;gap:18px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow-sm);align-items:start;}
+  .why .n{width:40px;height:40px;border-radius:10px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800;font-size:16px;}
+  .why h3{font-size:16.5px;}
+  .why p{color:var(--mute);font-size:14.5px;margin-top:6px;}
+  .why .tool-note{margin-top:8px;font-size:12.5px;color:var(--accent-2);background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:8px;padding:6px 10px;display:inline-block;}
+
+  /* works gallery */
+  .works{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  .work{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#fff;box-shadow:var(--shadow-sm);}
+  .work .ph{
+    aspect-ratio:4/3;display:grid;place-items:center;text-align:center;color:#fff;font-size:12.5px;font-weight:600;letter-spacing:.03em;
+    background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.06) 0 14px,transparent 14px 28px),linear-gradient(135deg,var(--navy-3),var(--accent-2));
+  }
+  .work .ph span{background:rgba(0,0,0,.22);padding:6px 12px;border-radius:999px;backdrop-filter:blur(2px);}
+  .work .meta{padding:14px 16px;}
+  .work .meta b{font-size:14.5px;color:var(--navy);}
+  .work .meta p{font-size:13px;color:var(--mute);margin-top:4px;}
+  .work .meta .cat{font-size:11px;color:var(--accent-2);font-weight:700;letter-spacing:.03em;}
+  .works-note{margin-top:16px;text-align:center;font-size:13px;color:var(--mute);}
+
+  /* area + flow */
+  .area-flow{display:grid;grid-template-columns:1fr 1.2fr;gap:30px;align-items:start;}
+  .area-box{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm);}
+  .area-box h3{font-size:16px;color:var(--navy);}
+  .area-box .map-ph{
+    margin-top:14px;border-radius:10px;height:170px;border:1px solid var(--accent-line);
+    background:radial-gradient(circle at 42% 44%, rgba(12,126,143,.22), transparent 42%),
+      linear-gradient(rgba(12,126,143,.1) 1px,transparent 1px),linear-gradient(90deg,rgba(12,126,143,.1) 1px,transparent 1px),var(--bg-soft);
+    background-size:auto,26px 26px,26px 26px,auto;display:grid;place-items:center;color:var(--accent-2);font-size:12.5px;font-weight:600;text-align:center;padding:0 14px;
+  }
+  .area-box .map-ph a{color:var(--accent-2);}
+  .area-tags{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;}
+  .flow{counter-reset:step;display:grid;gap:0;}
+  .flow .step{position:relative;padding:0 0 22px 52px;}
+  .flow .step:last-child{padding-bottom:0;}
+  .flow .step::before{
+    counter-increment:step;content:counter(step);position:absolute;left:0;top:0;
+    width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;font-weight:800;display:grid;place-items:center;font-size:15px;
+  }
+  .flow .step::after{content:"";position:absolute;left:16px;top:36px;bottom:6px;width:2px;background:var(--accent-line);}
+  .flow .step:last-child::after{display:none;}
+  .flow .step b{font-size:15.5px;color:var(--navy);}
+  .flow .step p{font-size:13.5px;color:var(--mute);margin-top:3px;}
+
+  /* company table */
+  .company-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm);}
+  .company-table th,.company-table td{text-align:left;padding:13px 18px;border-bottom:1px solid var(--line);font-size:14.5px;vertical-align:top;}
+  .company-table tr:last-child th,.company-table tr:last-child td{border-bottom:none;}
+  .company-table th{width:170px;background:var(--bg-soft);color:var(--navy);font-weight:700;white-space:nowrap;}
+  .company-table td .todo{color:var(--warn-ink);}
+  .map-link{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-weight:600;text-decoration:none;color:var(--accent-2);}
+
+  /* contact */
+  .contact{background:linear-gradient(180deg,var(--bg-soft),#e7eff4);}
+  .contact-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:30px;align-items:start;}
+  .contact-aside{background:var(--navy);color:#fff;border-radius:var(--radius);padding:26px;}
+  .contact-aside h3{font-size:18px;}
+  .contact-aside p{font-size:13.5px;color:#cdd9e2;margin-top:8px;}
+  .tel-big{display:flex;flex-direction:column;text-decoration:none;color:#fff;margin-top:18px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:14px 18px;}
+  .tel-big small{font-size:11px;color:#9fb2c0;font-weight:600;letter-spacing:.05em;}
+  .tel-big b{font-size:26px;letter-spacing:.02em;line-height:1.2;}
+  .tel-big .hours{font-size:12px;color:#aebdc9;margin-top:2px;}
+  .form-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:6px;}
+  .req{color:#c0392b;font-size:12px;margin-left:4px;}
+  .opt{color:var(--mute);font-size:11.5px;font-weight:600;margin-left:6px;}
+  .field input,.field select,.field textarea{
+    width:100%;font:inherit;font-size:15px;color:var(--ink);background:#fff;
+    border:1.5px solid var(--line);border-radius:10px;padding:11px 13px;min-height:46px;
+  }
+  .field textarea{min-height:120px;resize:vertical;line-height:1.6;}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .seg-note{font-size:12.5px;color:var(--accent-2);background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:8px;padding:8px 11px;margin-top:8px;}
+  .privacy-note{font-size:12px;color:var(--warn-ink);background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:8px;padding:10px 12px;margin:6px 0 16px;}
+  .demo-flag{font-size:12px;color:var(--warn-ink);background:var(--warn-bg);border:1px dashed var(--warn-line);border-radius:8px;padding:8px 11px;margin-top:6px;}
+  .form-result{display:none;margin-top:16px;border-radius:10px;padding:16px 18px;background:var(--accent-soft);border:1px solid var(--accent-line);color:var(--navy);font-size:14px;}
+  .form-result.show{display:block;}
+  .form-result a{color:var(--accent-2);font-weight:700;}
+
+  /* footer */
+  footer.site{background:var(--navy-2);color:#aebdc9;padding:44px 0 28px;font-size:13.5px;}
+  footer.site .cols{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:28px;}
+  footer.site .name{color:#fff;font-weight:800;font-size:16px;}
+  footer.site .name small{display:block;color:#9fb2c0;font-weight:600;font-size:11px;margin-top:3px;letter-spacing:.05em;}
+  footer.site a{color:#cdd9e2;text-decoration:none;}
+  footer.site a:hover{color:#fff;text-decoration:underline;}
+  footer.site h4{color:#fff;font-size:13px;letter-spacing:.05em;margin-bottom:10px;}
+  footer.site ul{display:grid;gap:7px;}
+  footer.site .meta{margin-top:14px;line-height:1.7;}
+  footer.site .recruit-line{margin-top:14px;font-size:12px;color:#8295a3;}
+  footer.site .bottom{margin-top:28px;padding-top:18px;border-top:1px solid rgba(255,255,255,.12);display:flex;flex-wrap:wrap;gap:8px 18px;justify-content:space-between;font-size:12px;color:#8295a3;}
+
+  /* sticky mobile CTA bar */
+  .mobile-cta-bar{display:none;}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:980px){
+    .hero .wrap{grid-template-columns:1fr;gap:34px;}
+    .hero-visual{order:2;}
+    .estimate-card{right:6px;bottom:-20px;width:230px;}
+    .g-4{grid-template-columns:repeat(2,1fr);}
+    .works{grid-template-columns:repeat(2,1fr);}
+    .area-flow{grid-template-columns:1fr;gap:24px;}
+    .contact-grid{grid-template-columns:1fr;gap:22px;}
+    .nav,.hdr-tel{display:none;}
+    .hdr-cta{display:none;}
+    .burger{display:flex;}
+  }
+  @media (max-width:640px){
+    body{font-size:15.5px;}
+    .pad{padding:48px 0;}
+    .wrap{padding:0 16px;}
+    .g-4,.prob-cols,.works,.why .item{grid-template-columns:1fr;}
+    .why .item{grid-template-columns:auto 1fr;}
+    footer.site .cols{grid-template-columns:1fr;gap:22px;}
+    .company-table th{width:118px;padding:11px 12px;font-size:13px;}
+    .company-table td{padding:11px 12px;font-size:13.5px;}
+    .hero h1{font-size:24px;}
+    .hero .wrap{padding-top:40px;padding-bottom:48px;}
+    .estimate-card{position:static;width:auto;margin-top:16px;right:auto;bottom:auto;}
+    .hero-cta .btn{flex:1;}
+    .tel-big b{font-size:22px;}
+    .mobile-cta-bar{
+      display:flex;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:60;
+      background:rgba(255,255,255,.97);border-top:1px solid var(--line);padding:8px 12px;
+      box-shadow:0 -4px 16px rgba(15,44,71,.1);
+    }
+    .mobile-cta-bar .btn{flex:1;min-height:46px;font-size:14px;padding:10px 8px;}
+    main{padding-bottom:64px;}
+  }
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="site" id="siteHeader">
+  <div class="wrap hdr">
+    <a class="brand" href="#top" aria-label="株式会社渡邉設備 トップへ">
+      <span class="name">株式会社渡邉設備<small>給排水衛生設備工事</small></span>
+    </a>
+    <nav class="nav" aria-label="グローバルナビ">
+      <a href="#services">事業内容</a>
+      <a href="#why">選ばれる理由</a>
+      <a href="#works">施工実績</a>
+      <a href="#flow">業務の流れ</a>
+      <a href="#company">会社概要</a>
+      <a href="#contact">お問い合わせ</a>
+    </nav>
+    <a class="hdr-tel" href="tel:03-6312-4479"><small>お電話でのご相談</small><b>03-6312-4479</b></a>
+    <a class="btn btn-primary btn-sm hdr-cta" href="#contact">見積・施工のご相談</a>
+    <button class="burger" id="burger" aria-label="メニューを開く" aria-expanded="false"><span></span></button>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <div class="wrap">
+      <a href="#services">事業内容</a>
+      <a href="#why">選ばれる理由</a>
+      <a href="#works">施工実績</a>
+      <a href="#flow">業務の流れ</a>
+      <a href="#company">会社概要</a>
+      <a href="#contact">お問い合わせ</a>
+      <div class="row">
+        <a class="btn btn-ghost btn-sm" href="tel:03-6312-4479">電話する</a>
+        <a class="btn btn-primary btn-sm" href="#contact">相談する</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <span class="eyebrow">ゼネコン・サブコン様向け｜給排水衛生設備工事の協力会社</span>
+        <h1>図面の拾い出しから、根拠ある見積へ。<br><span class="hl">給排水衛生設備工事</span>を一式で対応します。</h1>
+        <p class="lead">ゼネコン・サブコン様の協力会社として、新築・改修現場の給排水衛生設備工事を、見積から施工・施工管理・引き渡しまで一貫してお引き受けします。図面の拾い出し（数量積算）に基づく見積で、原価の根拠が明確で、仕様変更にも迅速に対応します。</p>
+        <p class="note" style="margin-top:10px;">※ 見積時の現地調査が必要な場合は費用別途となります。</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary arrow" href="#contact" data-seg="ゼネコン・サブコン">見積・施工について相談する</a>
+          <a class="btn btn-on-navy" href="#services">対応できる工事内容を見る</a>
+        </div>
+        <div class="hero-sublinks">
+          <a href="#contact" data-seg="オーナー">▸ ビル・施設オーナー様／管理会社様はこちら（設備改修・配管更新）</a>
+          <a href="#flow">▸ 見積の進め方・業務の流れを見る</a>
+          <a href="#area">▸ 関東一円以外の現場はご相談ください</a>
+        </div>
+        <div class="hero-stats">
+          <div><b>関東一円</b>の現場に対応（東京・神奈川・千葉・埼玉・茨城・栃木・群馬）</div>
+          <div><b>給排水衛生設備工事</b>を一式（新築・改修・更新・修繕）</div>
+          <div><b>図面の拾い出し</b>に基づく根拠ある概算見積</div>
+        </div>
+      </div>
+
+      <div class="hero-visual" aria-hidden="true">
+        <!-- TODO(本番): ここを実際の施工現場写真に差し替え可（現状は配管ルートのイメージ図） -->
+        <div class="blueprint">
+          <div class="bp-top"><span>給排水設備 配管ルート（イメージ）</span><span>WATANABE SETSUBI</span></div>
+          <svg viewBox="0 0 320 200" role="img" aria-label="配管ルートのイメージ図">
+            <g fill="none" stroke="#7ddbe5" stroke-width="3" stroke-linecap="round">
+              <path d="M24 168 L24 96 L120 96 L120 40 L232 40" />
+              <path d="M120 96 L120 132 L208 132 L208 168" />
+              <path d="M232 40 L296 40 L296 120 L256 120" />
+            </g>
+            <g fill="#cdeef2">
+              <circle cx="24" cy="168" r="6"/><circle cx="120" cy="96" r="6"/>
+              <circle cx="120" cy="40" r="5"/><circle cx="232" cy="40" r="6"/>
+              <circle cx="208" cy="132" r="5"/><circle cx="208" cy="168" r="6"/>
+              <circle cx="296" cy="40" r="5"/><circle cx="256" cy="120" r="6"/>
+            </g>
+            <g fill="#9fdfe6" font-size="9" font-family="sans-serif">
+              <text x="8" y="186">メーター</text>
+              <text x="186" y="186">器具A</text>
+              <text x="220" y="116">器具B</text>
+              <text x="238" y="32">分岐</text>
+            </g>
+          </svg>
+        </div>
+        <div class="estimate-card">
+          <h4><span class="dot"></span>図面 → 数量拾い出し → 概算見積</h4>
+          <table>
+            <tr><td>給水管 20A</td><td>32.5 m</td></tr>
+            <tr><td>排水管 50A</td><td>18.0 m</td></tr>
+            <tr><td>継手・バルブ類</td><td>一式</td></tr>
+            <tr><td>衛生器具</td><td>6 か所</td></tr>
+          </table>
+          <div class="tot"><span>概算見積（図面確認後）</span><b>¥ ───</b></div>
+          <p class="cap">自社の拾い出し・歩掛データで数量を積み上げて算出します。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROBLEMS（共感） ============ -->
+  <section class="pad" id="problems">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">こんなお困りごと、ありませんか</span>
+        <h2>給排水衛生設備工事、任せられる協力会社をお探しではありませんか</h2>
+        <p>新築・改修現場のご担当者様、施工管理・積算ご担当者様、法人のオーナー様・管理会社様から、よくいただくご相談です。</p>
+      </div>
+      <div class="prob-cols">
+        <div class="prob">
+          <h3><span class="pill">ゼネコン・サブコン様</span></h3>
+          <ul>
+            <li>給排水の協力会社が高齢化・人手不足で、安定して手配しづらい</li>
+            <li>見積が遅い・数量の根拠があいまいで、原価が読みにくい</li>
+            <li>新築・改修の給排水衛生設備工事を、拾い出しから引き渡しまで任せられる先がほしい</li>
+            <li>仕様変更・追加にも、段取りよく対応できる協力会社と組みたい</li>
+          </ul>
+        </div>
+        <div class="prob">
+          <h3><span class="pill">ビル・施設オーナー様／管理会社様</span></h3>
+          <ul>
+            <li>配管の老朽化・漏水に備え、計画的に更新したい</li>
+            <li>賃貸住宅・社宅・寮の原状回復に伴う給排水工事を、まとめて任せたい</li>
+            <li>店舗・テナント・施設の給排水設備を、専門の会社にきちんと見て見積してほしい</li>
+            <li>工事内容と費用の根拠を、書面で分かりやすく示してほしい</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SERVICES（事業内容） ============ -->
+  <section class="pad pad-soft" id="services">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">事業内容</span>
+        <h2>新築から改修・修繕まで、給排水衛生設備工事を一式で</h2>
+        <p>給水・給湯・排水・通気・衛生器具まわりを、図面の拾い出しから施工・施工管理・引き渡しまで対応します。</p>
+      </div>
+      <div class="grid g-4">
+        <div class="card">
+          <div class="ic">🏗️</div>
+          <div class="card-no">SERVICE 01</div>
+          <h3>新築の給排水衛生設備工事（一式対応）</h3>
+          <p>新築現場の給水・給湯・排水・通気・衛生器具設備を一式で。図面の拾い出しから施工・施工管理・試運転・引き渡しまでお引き受けします。</p>
+          <div class="tag-row"><span class="tag">マンション</span><span class="tag">商業施設</span><span class="tag">プラント</span><span class="tag">公共施設（学校等）</span></div>
+        </div>
+        <div class="card">
+          <div class="ic">🔁</div>
+          <div class="card-no">SERVICE 02</div>
+          <h3>改修・更新工事（賃貸・店舗・施設）</h3>
+          <p>賃貸住宅・社宅・店舗・テナント・施設の設備改修。衛生器具の更新、給排水配管の更新、原状回復に伴う給排水工事まで対応します。</p>
+          <div class="tag-row"><span class="tag">賃貸・社宅・寮</span><span class="tag">店舗・テナント</span><span class="tag">配管更新</span><span class="tag">原状回復</span></div>
+        </div>
+        <div class="card">
+          <div class="ic">🔧</div>
+          <div class="card-no">SERVICE 03</div>
+          <h3>修繕・メンテナンス</h3>
+          <p>ビル・マンション・施設の漏水修理、排水詰まり、給水・排水配管の補修・更新、衛生器具の交換など。<br><span style="font-size:12px;">※給排水まわりの設備交換に対応します（ガス接続工事は対象外）。</span></p>
+          <div class="tag-row"><span class="tag">漏水修理</span><span class="tag">排水詰まり</span><span class="tag">器具更新</span></div>
+        </div>
+        <div class="card">
+          <!-- TODO(本番): 「LIXIL・TOTO 正規代理店／取扱店」表記の正確な可否を確認してから断定表現にする -->
+          <div class="ic">🚰</div>
+          <div class="card-no">SERVICE 04</div>
+          <h3>衛生器具・設備機器の調達・取付</h3>
+          <p>LIXIL・TOTO ほかメーカーの衛生器具・設備機器を調達・ご提案・取付。配管工事と機器手配を一社にまとめられます。<br><span style="font-size:12px;color:var(--warn-ink);">（取扱メーカー・代理店表記は確認のうえ掲載予定）</span></p>
+          <div class="tag-row"><span class="tag">衛生器具</span><span class="tag">システムキッチン・UB</span><span class="tag">メーカー製品</span><span class="tag">調達・取付</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WHY（選ばれる理由） ============ -->
+  <section class="pad" id="why">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">選ばれる理由</span>
+        <h2>数量の根拠が見えて、給排水衛生設備工事を一式で任せられます</h2>
+      </div>
+      <div class="why">
+        <div class="item">
+          <div class="n">1</div>
+          <div>
+            <h3>図面の拾い出しに基づく、根拠ある見積</h3>
+            <p>図面（PDF・画像）から給排水衛生設備の数量を拾い出し、自社の歩掛データで積み上げて算出。「どの数量が、なぜこの金額か」が分かる概算見積をご提示します。元請様の積算・実行予算づくりにもお使いいただけます。事務所での図面確認・積算対応と、現場での施工管理を両立しています。</p>
+            <span class="tool-note">自社開発の配管拾い出しツールで数量を整理 → 根拠ある数量・見積へ</span>
+          </div>
+        </div>
+        <div class="item">
+          <div class="n">2</div>
+          <div>
+            <h3>新築・改修現場を一式でお引き受け</h3>
+            <p>数量拾い出し → 概算見積 → 施工 → 施工管理 → 試運転 → 引き渡しまで自社で対応。窓口がひとつにまとまり、工程・品質の責任を持って進めます。</p>
+          </div>
+        </div>
+        <div class="item">
+          <div class="n">3</div>
+          <div>
+            <h3>仕様変更・追加にも段取りよく対応</h3>
+            <p>現場で起きる仕様変更・追加にも、数量と費用への影響を整理してご報告。後出しの精算トラブルを減らします。衛生器具・設備機器の調達もまとめてお任せいただけます。</p>
+          </div>
+        </div>
+        <div class="item">
+          <div class="n">4</div>
+          <div>
+            <h3>関東一円の現場に対応</h3>
+            <p>東京・神奈川・千葉・埼玉・茨城・栃木・群馬の新築・改修現場に対応します。それ以外のエリアでも、規模・内容によってはご相談いただけます。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ WORKS（施工実績） ============ -->
+  <section class="pad pad-soft" id="works">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">施工実績</span>
+        <h2>施工事例（順次掲載していきます）</h2>
+        <p>新築の給排水衛生設備工事、賃貸・施設の設備改修、給排水配管の更新工事など。</p>
+      </div>
+      <!-- TODO(本番): 各カードを実際の施工写真・物件種別・概要に差し替え。発注者／元請の掲載許可を確認のうえ掲載。Google ビジネスプロフィールにも同じ写真を投稿。 -->
+      <div class="works">
+        <figure class="work">
+          <div class="ph"><span>📷 施工写真（掲載準備中）</span></div>
+          <figcaption class="meta"><span class="cat">新築マンション</span><br><b>集合住宅 給排水衛生設備工事</b><p>各住戸の給水・給湯・排水・衛生器具まで一式を施工。</p></figcaption>
+        </figure>
+        <figure class="work">
+          <div class="ph"><span>📷 施工写真（掲載準備中）</span></div>
+          <figcaption class="meta"><span class="cat">新築戸建住宅</span><br><b>戸建 給排水衛生設備工事</b><p>基礎配管から器具取付まで。元請様の協力会社として対応。</p></figcaption>
+        </figure>
+        <figure class="work">
+          <div class="ph"><span>📷 施工写真（掲載準備中）</span></div>
+          <figcaption class="meta"><span class="cat">マンション・ビル</span><br><b>給排水配管 更新工事</b><p>老朽化した給水・排水配管の更新。入居中の居ながら施工にも対応。</p></figcaption>
+        </figure>
+        <figure class="work">
+          <div class="ph"><span>📷 施工写真（掲載準備中）</span></div>
+          <figcaption class="meta"><span class="cat">店舗・テナント</span><br><b>改装に伴う給排水設備工事</b><p>レイアウト変更に伴う給排水・衛生設備の移設・新設。</p></figcaption>
+        </figure>
+        <figure class="work">
+          <div class="ph"><span>📷 施工写真（掲載準備中）</span></div>
+          <figcaption class="meta"><span class="cat">賃貸住宅・社宅</span><br><b>原状回復に伴う給排水・衛生器具更新</b><p>既存設備の撤去から配管調整、新規器具の設置まで。複数住戸も対応。</p></figcaption>
+        </figure>
+        <figure class="work">
+          <div class="ph"><span>📷 施工写真（掲載準備中）</span></div>
+          <figcaption class="meta"><span class="cat">施設・店舗</span><br><b>トイレ・給湯室 設備改修</b><p>節水型便器等への更新と給排水まわりの調整。営業時間外施工にも対応。</p></figcaption>
+        </figure>
+      </div>
+      <p class="works-note">※ 写真は順次掲載します。掲載にあたっては発注者・元請様の許可を確認のうえ掲載します。</p>
+    </div>
+  </section>
+
+  <!-- ============ FLOW & AREA（業務の流れ＆対応エリア） ============ -->
+  <section class="pad" id="flow">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">業務の流れ＆対応エリア</span>
+        <h2>ご相談から見積、施工、引き渡しまで</h2>
+        <p>図面（PDF・画像）をいただければ、拾い出しと概算見積からご相談に乗れます。</p>
+      </div>
+      <div class="area-flow">
+        <div class="area-box" id="area">
+          <h3>対応エリア</h3>
+          <!-- TODO(本番): 関東一円のうち実際に動ける範囲を確定して注記 -->
+          <div class="map-ph">
+            関東一円（東京・神奈川・千葉・埼玉・茨城・栃木・群馬）を中心に対応（イメージ）<br>
+            <a href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E8%B6%B3%E7%AB%8B%E5%8C%BA%E5%85%AD%E6%9C%A82-10-9" target="_blank" rel="noopener">Googleマップで所在地を見る ↗</a>
+            <!-- TODO(本番): Google Maps embed
+            <iframe
+              src="https://www.google.com/maps/embed?pb=【本番URLをここに】"
+              width="100%" height="200"
+              style="border:0;border-radius:10px;margin-top:14px;"
+              allowfullscreen="" loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+            -->
+          </div>
+          <p style="font-size:13.5px;color:var(--mute);margin-top:14px;">関東一円（東京・神奈川・千葉・埼玉・茨城・栃木・群馬）の新築・改修現場に対応します。それ以外のエリアでも、規模・内容によってはご相談ください。</p>
+          <div class="area-tags">
+            <span class="tag">東京都</span><span class="tag">神奈川県</span><span class="tag">千葉県</span><span class="tag">埼玉県</span><span class="tag">茨城県</span><span class="tag">栃木県</span><span class="tag">群馬県</span><span class="tag">それ以外はご相談</span>
+          </div>
+        </div>
+        <div>
+          <div class="flow">
+            <div class="step"><b>お問い合わせ・図面のご相談</b><p>お電話またはフォームから。図面（PDF・画像）・物件種別・おおよその規模・希望時期をお知らせください。</p></div>
+            <div class="step"><b>図面確認・数量の拾い出し</b><p>図面をもとに給排水衛生設備の数量を拾い出します。必要に応じて現地を調査します。現地調査が必要な場合は費用別途となります。</p></div>
+            <div class="step"><b>概算見積のご提示</b><p>数量の根拠を添えて概算見積をご提示します（詳細条件や仕様によって変動します）。</p></div>
+            <div class="step"><b>ご発注・施工・施工管理</b><p>工程を調整して施工。仕様変更・追加には、数量と費用への影響を整理してご報告します。</p></div>
+            <div class="step"><b>引き渡し前の追加工事対応</b><p>引き渡し前に発生した追加工事分についても、都度見積をご提示します。</p></div>
+            <div class="step"><b>試運転・引き渡し・アフター</b><p>試運転・確認のうえ引き渡し。引き渡し後の不具合にも対応します。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ COMPANY（会社概要） ============ -->
+  <section class="pad pad-soft" id="company">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">会社概要</span>
+        <h2>株式会社渡邉設備</h2>
+      </div>
+      <div style="max-width:840px;margin:0 auto;">
+        <table class="company-table">
+          <tr><th>商号</th><td>株式会社渡邉設備</td></tr>
+          <tr><th>所在地</th><td>〒120-0001 東京都足立区六木2-10-9</td></tr>
+          <tr><th>代表者</th><td>代表取締役 渡邉 謙介</td></tr>
+          <tr><th>設立／創業</th><td>創業 XX 年 ／ 設立 XX 年</td></tr>
+          <tr><th>資本金</th><td>X,XXX 万円</td></tr>
+          <tr><th>従業員数</th><td>XX 名</td></tr>
+          <tr><th>事業内容</th><td>給排水設備工事業 — 給排水衛生設備工事（新築・改修・更新・修繕）、衛生器具・設備機器の販売・取付（※ガス工事は扱っておりません）</td></tr>
+          <tr><th>対応エリア</th><td>関東一円（東京・神奈川・千葉・埼玉・茨城・栃木・群馬）。それ以外のエリアでも、規模・内容によってはご相談ください。</td></tr>
+          <tr><th>建設業許可</th><td>東京都知事許可（般-XX）第XXXXX号 ／ 管工事業</td></tr>
+          <tr><th>登録・資格</th><td>登録給水装置工事事業者 第XXXX号 ほか</td></tr>
+          <tr><th>取扱メーカー</th><td>LIXIL ／ TOTO ほか主要メーカー製品の取扱・調達・取付に対応</td></tr>
+          <tr><th>主要取引先</th><td>◯◯建設 ／ ◯◯設備 ／ ◯◯管理 ほか（順不同・敬称略）</td></tr>
+          <tr><th>お取引先金融機関</th><td>みずほ銀行 ◯◯支店 ／ 三菱UFJ銀行 ◯◯支店</td></tr>
+          <tr><th>連絡先</th><td>TEL <a href="tel:03-6312-4479">03-6312-4479</a> ／ 受付時間 平日 9:00〜18:00（日祝を除く） ／ メール <a href="mailto:info@watanabe-setsubi.co.jp">info@watanabe-setsubi.co.jp</a></td></tr>
+        </table>
+        <a class="map-link" href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E8%B6%B3%E7%AB%8B%E5%8C%BA%E5%85%AD%E6%9C%A82-10-9" target="_blank" rel="noopener">📍 Googleマップで見る ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTACT（お問い合わせ） ============ -->
+  <section class="pad contact" id="contact">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">お問い合わせ</span>
+        <h2>図面のご相談・お見積りのお問い合わせ</h2>
+        <p>ゼネコン・サブコン様、法人のビル・施設オーナー様・管理会社様、いずれもこちらから。お急ぎの場合はお電話が確実です。</p>
+        <p style="font-size:12.5px;color:var(--warn-ink);background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:8px;padding:8px 12px;display:inline-block;margin-top:12px;">※恐れ入りますが、個人のお住まいの工事のご依頼は承っておりません。お取引のある元請様・設備会社様を通じてご相談ください。</p>
+      </div>
+      <div class="contact-grid">
+        <aside class="contact-aside">
+          <h3>お電話でのご相談</h3>
+          <p>図面（PDF・画像）をお持ちなら、拾い出し・概算見積のご相談もスムーズです。「○○の件で」とお伝えください。</p>
+          <a class="tel-big" href="tel:03-6312-4479">
+            <small>TEL（タップで発信）</small>
+            <b>03-6312-4479</b>
+            <span class="hours">受付時間 平日 9:00〜18:00（日祝を除く）</span>
+          </a>
+          <p style="margin-top:18px;font-size:13px;color:#9fb2c0;">対応エリア：関東一円（東京・神奈川・千葉・埼玉・茨城・栃木・群馬）。それ以外はご相談ください。</p>
+        </aside>
+
+        <div class="form-card">
+          <!-- TODO(本番): フォームを Tally / Formspree / Google フォーム等（図面・写真の添付に対応するもの）に接続し、送信先メールを設定。下記 form の action / method を差し替える。 -->
+          <form id="contactForm" novalidate>
+            <div class="field">
+              <label for="seg">お問い合わせ区分<span class="req">必須</span></label>
+              <select id="seg" name="区分" required>
+                <option value="">選択してください</option>
+                <option value="ゼネコン・サブコン">ゼネコン・サブコン様（協力会社のご相談・お見積り）</option>
+                <option value="オーナー">法人のビル・施設オーナー様／管理会社様（設備改修・配管更新のご相談）</option>
+              </select>
+              <div class="seg-note" id="segNote" style="display:none;"></div>
+            </div>
+            <div class="field">
+              <label for="f-company">会社名<span class="req">必須</span></label>
+              <input type="text" id="f-company" name="会社名" placeholder="例：株式会社○○建設／○○設備（株）／○○管理（株）" required>
+            </div>
+            <div class="field">
+              <label for="pname">ご担当者名<span class="req">必須</span></label>
+              <input type="text" id="pname" name="担当者名" placeholder="例：渡邉 太郎" required>
+            </div>
+            <div class="field">
+              <label for="tel">電話番号<span class="req">必須</span></label>
+              <input type="tel" id="tel" name="電話番号" placeholder="例：03-6312-4479 / 090-0000-0000" required>
+            </div>
+            <div class="field">
+              <label for="email">メールアドレス<span class="req">必須</span></label>
+              <input type="email" id="email" name="メールアドレス" placeholder="例：name@example.com" required>
+            </div>
+            <div class="field">
+              <label for="place">現場の所在地<span class="opt">任意</span></label>
+              <input type="text" id="place" name="現場所在地" placeholder="例：千葉県○○市○○">
+            </div>
+            <div class="field">
+              <label for="when">ご希望の時期<span class="opt">任意</span></label>
+              <select id="when" name="希望時期">
+                <option value="">選択してください</option>
+                <option>できるだけ早く</option>
+                <option>1ヶ月以内</option>
+                <option>3ヶ月以内</option>
+                <option>半年以内</option>
+                <option>未定・相談したい</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="msg">ご相談内容<span class="req">必須</span></label>
+              <textarea id="msg" name="相談内容" placeholder="工事の種類・物件種別（新築/改修/更新/修繕、マンション/戸建/店舗/施設 等）・おおよその規模・図面の有無・希望時期 などをご記入ください。" required></textarea>
+            </div>
+            <div class="field">
+              <label for="file">図面・資料の添付<span class="opt">任意</span></label>
+              <input type="file" id="file" name="添付ファイル" multiple disabled>
+              <div class="demo-flag">※このデモ画面では添付ファイルの送信はできません。本番ではフォームサービス（図面・写真の添付に対応）で受け付けます。</div>
+            </div>
+            <!-- TODO(本番): 下のリンク先を実際のプライバシーポリシー（privacy.html 等）に -->
+            <div class="privacy-note">
+              いただいた図面・資料に、発注者や建物利用者など第三者の個人情報が含まれる場合は、その取扱いについてご同意のうえ送信してください。送信内容はお問い合わせ対応の目的にのみ使用します。詳細は<a href="privacy.html">プライバシーポリシー</a>をご確認ください。
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">送信する</button>
+            <div class="form-result" id="formResult"></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="site">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="name">株式会社渡邉設備<small>WATANABE SETSUBI CO., LTD.｜給排水衛生設備工事</small></div>
+        <div class="meta">
+          〒120-0001 東京都足立区六木2-10-9<br>
+          TEL <a href="tel:03-6312-4479">03-6312-4479</a><br>
+          <a href="https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E8%B6%B3%E7%AB%8B%E5%8C%BA%E5%85%AD%E6%9C%A82-10-9" target="_blank" rel="noopener">Googleマップで見る ↗</a>
+        </div>
+        <p class="recruit-line">※ 給排水設備工・現場管理、協力会社（一人親方）の募集も行っています。ご希望の方はお電話でお問い合わせください。</p>
+      </div>
+      <div>
+        <h4>サイト内</h4>
+        <ul>
+          <li><a href="#services">事業内容</a></li>
+          <li><a href="#why">選ばれる理由</a></li>
+          <li><a href="#works">施工実績</a></li>
+          <li><a href="#flow">業務の流れ・対応エリア</a></li>
+          <li><a href="#company">会社概要</a></li>
+          <li><a href="#contact">お問い合わせ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>事業内容</h4>
+        <ul>
+          <li>新築 給排水衛生設備工事（一式対応）</li>
+          <li>改修・更新工事（賃貸・店舗・施設）</li>
+          <li>修繕・メンテナンス</li>
+          <li>衛生器具・設備機器の調達・取付</li>
+        </ul>
+        <h4 style="margin-top:16px;">対応エリア</h4>
+        <ul><li>関東一円（東京・神奈川・千葉・埼玉・茨城・栃木・群馬）</li><li>それ以外はご相談ください</li></ul>
+      </div>
+    </div>
+    <div class="bottom">
+      <span>© 2026 株式会社渡邉設備</span>
+      <span>ゼネコン・サブコン様、法人のオーナー様・管理会社様向け（個人のお住まいの直接ご依頼は承っておりません）／給排水専門・ガス工事は扱っておりません／<a href="privacy.html" style="color:#cdd9e2">プライバシーポリシー</a></span>
+    </div>
+  </div>
+</footer>
+
+<!-- sticky mobile CTA (phones only) -->
+<div class="mobile-cta-bar">
+  <a class="btn btn-ghost" href="tel:03-6312-4479">📞 電話する</a>
+  <a class="btn btn-primary" href="#contact">見積・施工を相談</a>
+</div>
+
+<!-- ============ JSON-LD（NAP は GBP と完全一致させること。値は TODO で要差し替え） ============ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Plumber",
+  "name": "株式会社渡邉設備",
+  "description": "給排水衛生設備工事の専門会社。ゼネコン・サブコン様の協力会社として、新築・改修現場の給排水衛生設備工事を、図面の拾い出し（数量積算）から施工・施工管理・引き渡しまで一式で対応。法人のビル・施設オーナー様・管理会社様の設備改修・配管更新も。",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "六木2-10-9",
+    "addressLocality": "足立区",
+    "addressRegion": "東京都",
+    "postalCode": "120-0001",
+    "addressCountry": "JP"
+  },
+  "telephone": "+81-3-6312-4479",
+  "areaServed": ["東京都", "神奈川県", "千葉県", "埼玉県", "茨城県", "栃木県", "群馬県"],
+  "knowsAbout": ["給排水衛生設備工事", "給排水配管更新", "衛生器具更新", "数量拾い出し・積算"]
+}
+</script>
+
+<script>
+  // ===== sticky header shadow =====
+  var header = document.getElementById('siteHeader');
+  function onScroll(){ header.classList.toggle('scrolled', window.scrollY > 4); }
+  onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+
+  // ===== mobile nav =====
+  var burger = document.getElementById('burger');
+  var mobileNav = document.getElementById('mobileNav');
+  burger.addEventListener('click', function(){
+    var open = mobileNav.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    burger.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+  });
+  mobileNav.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ mobileNav.classList.remove('open'); burger.setAttribute('aria-expanded','false'); });
+  });
+
+  // ===== contact: preselect 区分 from CTA, and segment note =====
+  var segSelect = document.getElementById('seg');
+  var segNote = document.getElementById('segNote');
+  var SEG_NOTES = {
+    'ゼネコン・サブコン': 'ゼネコン・サブコン様へ：図面（PDF・画像）をお送りいただければ、数量の拾い出しと概算見積に対応します。継続的な協力体制のご相談も歓迎です。',
+    'オーナー': '法人のビル・施設オーナー様・管理会社様へ：賃貸・店舗・施設の設備改修、漏水修繕、給排水配管の更新など、物件を確認のうえお見積りします。状況・図面（あれば）をお知らせください。'
+  };
+  function updateSegNote(){
+    var v = segSelect.value;
+    if (v && SEG_NOTES[v]) { segNote.textContent = SEG_NOTES[v]; segNote.style.display = 'block'; }
+    else { segNote.style.display = 'none'; }
+  }
+  segSelect.addEventListener('change', updateSegNote);
+  // CTA links carrying data-seg pre-select the dropdown
+  document.querySelectorAll('a[data-seg]').forEach(function(a){
+    a.addEventListener('click', function(){
+      var seg = a.getAttribute('data-seg');
+      if (segSelect) { segSelect.value = seg; updateSegNote(); }
+    });
+  });
+
+  // ===== contact form: demo behavior (not yet connected to a backend) =====
+  var form = document.getElementById('contactForm');
+  var result = document.getElementById('formResult');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    // basic required check
+    var missing = [];
+    ['seg','f-company','pname','tel','email','msg'].forEach(function(id){
+      var el = document.getElementById(id);
+      if (!el.value.trim()) { el.style.borderColor = '#c0392b'; missing.push(el); }
+      else { el.style.borderColor = ''; }
+    });
+    if (missing.length){
+      missing[0].focus();
+      result.className = 'form-result show';
+      result.style.background = '#fff4f4'; result.style.borderColor = '#f3c2c2'; result.style.color = '#7a2620';
+      result.textContent = '未入力の必須項目があります。入力内容をご確認ください。';
+      return;
+    }
+    // build a mailto fallback so the demo still "does something"
+    var seg = document.getElementById('seg').value;
+    var subject = '【お問い合わせ】' + seg + ' / ' + document.getElementById('f-company').value;
+    var body =
+      '区分：' + seg + '\n' +
+      '会社名：' + document.getElementById('f-company').value + '\n' +
+      'ご担当者名：' + document.getElementById('pname').value + '\n' +
+      '電話番号：' + document.getElementById('tel').value + '\n' +
+      'メール：' + document.getElementById('email').value + '\n' +
+      '現場所在地：' + document.getElementById('place').value + '\n' +
+      '希望時期：' + document.getElementById('when').value + '\n' +
+      'ご相談内容：\n' + document.getElementById('msg').value + '\n';
+    var mailto = 'mailto:info@watanabe-setsubi.co.jp?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    result.className = 'form-result show';
+    result.style.background = ''; result.style.borderColor = ''; result.style.color = '';
+    result.innerHTML =
+      '<b>【デモ表示】</b> 入力内容を確認しました。<br>'+
+      'このデモ画面はまだ送信先が設定されていません（本番ではフォームサービス／メールに接続します）。<br>'+
+      'いますぐ連絡したい場合：<a href="tel:03-6312-4479">📞 03-6312-4479</a> ／ '+
+      '<a href="' + mailto + '">✉ メールソフトで送信内容を開く</a>';
+    result.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+</script>
+</body>
+</html>

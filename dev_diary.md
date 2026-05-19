@@ -1,5 +1,90 @@
 # 開発日誌
 
+## 2026-05-20 — 配管拾いツール v4 リリース ＋ 渡邉設備 LP v2
+
+ヒアリング結果を反映した 2 ファイルを新規バージョンとして追加。既存 v3.1 / v1 LP は保全し、追加ベースで対応。
+
+### 1. piping_takeoff_tool_v4.html（配管拾いツール v4）
+
+#### 追加：作業見積タブ
+
+- 既存タブ右端に「作業見積」タブを新設。歩掛マスター / 付帯作業 / プレビュー / CSV 出力ボタンの 4 ブロック構成。
+- 歩掛マスター（管種区分別）：塩ビ管 ×1.0 / 電気融着 ×1.25 / 鉄管 ×1.75 / その他 ×1.0、基準時間 15分/m、単価 3,000円/15分。すべて UI から編集可、即時再計算。
+- 付帯作業：天井アンカー（手入力）／支持台固定（配管総長 1m ごとに 1 台で自動算出 + 追加入力欄、`Math.ceil` 採用）。空調冷媒管は今回スコープ外で含めず。
+- 計算式：`分 = length × factor × baseMin`、`金額 = 分 / 15 × unitPrice`、`人工 = 分 / 480`。
+- CSV 出力：`work_estimate.csv`（BOM 付き、`csvEscape` でセル単位エスケープ、合計行付き）。既存の `bukake CSV` とは別ファイル。
+- localStorage：新キー `pipingWorkEstimate` のみ使用。既存の `pipingToolData` / `pipingScale` は触らない。支持台は「追加入力分」のみ保存、自動算出分は表示時に再算出。
+- 再計算トリガー：`addEdge / deleteEdge / undoLastEdge / deleteSelectedEdge / deleteNode / clearAllData` の 6 関数末尾に `maybeRecalcWorkEstimate()` を追加（タブが active のときだけ recalc）。
+
+#### バグ修正：addNodeFromForm の座標変換
+
+- 症状：フォーム経由でノード登録すると、ズーム ≠ 1.0 のとき画像座標系の外に配置され、図面上に点が出ない。
+- 原因：`imageLoaded === false` のフォールバック分岐で `scrollLeft + rect.width/2` ベースに `canvas.width / rect.width` を掛けていたが、`zoomLevel` の逆変換が抜けていた。さらに画像未ロード時は `canvas.width` が初期値（≈300px）のまま固定なので、`rect.width` が大きいペインだと座標が一気に画像外へ飛ぶ。
+- 対応：画像未ロード時のフォールバック式を `cx = (canvas.width / 2) / zoomLevel` に変更し、`canvas.width / zoomLevel` 範囲を超える場合の clamp ガードを追加。`placeNodeAt(...)` 呼び出しは維持。
+- ロード後はクリック待機モードに入る既存挙動なので、こちらは無修正。
+
+#### その他
+
+- ヘッダー版表記：`v3.1` → `v4`、`exportJSON()` 内の `version: 'v3'` → `'v4'`。
+- INIT セクションに `loadWorkEstimate(); renderWorkEstimateMasters();` を追加。
+- 自動検証：`node --check` で構文 OK、関数参照の整合性も grep でクロスチェック。
+
+### 2. watanabe_setsubi_lp_v2.html（渡邉設備 LP v2）
+
+#### ターゲット変更
+
+- 「工務店・ハウスメーカー・ゼネコン様」→ **「ゼネコン・サブコン様」** で全箇所統一（title / meta / OGP / コメント / hero / 問題セクション / contact / select / footer / JSON-LD / JS の `SEG_NOTES`）。
+- 残存「工務店」言及 4 箇所（施工実績 figcaption、主要取引先、警告 note、会社名 placeholder）も合わせて押さえ。
+
+#### 対応エリア拡張
+
+- 「東京・千葉・埼玉」→ **「関東一円（東京・神奈川・千葉・埼玉・茨城・栃木・群馬）」+ それ以外はご相談ください** で統一。
+- hero stats、area-box（タグ 7 都県 + ご相談）、会社概要、フッター、JSON-LD `areaServed`、hero-sublinks すべて更新。
+
+#### 業務フロー追記
+
+- 「図面確認・数量の拾い出し」本文末尾に「現地調査が必要な場合は費用別途となります。」追加。
+- 「試運転・引き渡し・アフター」の直前に **「引き渡し前の追加工事対応」** ステップを新設（CSS counter で自動採番）。
+- hero に `.note` を追加：「見積時の現地調査が必要な場合は費用別途となります。」
+
+#### その他
+
+- 物件種別タグ（SERVICE 01）：「マンション / 戸建住宅 / 店舗・テナント / 施設・倉庫」→ 「マンション / 商業施設 / プラント / 公共施設（学校等）」。SERVICE 02-04 は事業ライン違いで対象外。
+- area-box の `.map-ph` に Google Maps embed 用 iframe コメント雛形を挿入（テキストリンクは残存）。
+- why セクション item 1 に「事務所での図面確認・積算対応と、現場での施工管理を両立しています。」を追記。
+- area-box に `id="area"` を付与し、hero-sublinks の「関東一円以外はご相談」リンクから到達できるように。
+
+#### 二重ファイル対応
+
+- root と `design_handoff_lp_updates/` の両方が同一 v1 だったため、root に全変更を適用した後 `cp` で同期。最終的に `diff -q` でゼロ差分を確認。
+
+### 自動検証で通った項目
+
+- `node --check`：v4 / LP v2 とも構文 OK
+- `json.loads`：LP v2 の JSON-LD パース OK（areaServed 7 都県）
+- 旧表記カウント：「工務店・ハウスメーカー」「東京・千葉・埼玉」とも 0 件
+- 新表記カウント：「ゼネコン・サブコン」14、「関東一円」14、iframe 雛形 1、現地調査別途 2（hero + flow）
+
+### ブラウザでの最終確認は未実施
+
+CLAUDE.md「§9 確認ルール」に従い、以下は実機での手動確認が必要：
+
+- v4：作業見積タブの表示、マスター編集の即時反映、edges 変化 6 シナリオでの再計算追随、`work_estimate.csv` を Excel で開いた際の日本語表示、画像未ロード + ズーム 50% でフォームノード登録 → 中央付近に表示
+- LP v2：hero / area-box / フロー / フォーム区分連動の見た目、スマホ表示崩れの有無
+
+### 残課題（社長判断待ち、前回からの継続）
+
+- 創業／設立年、資本金、従業員数
+- 建設業許可番号、登録給水装置工事事業者番号
+- 主要取引先・お取引銀行の社名と掲載可否
+- LIXIL / TOTO「正規代理店／取扱店」表記
+- 施工実績写真（発注者・元請の掲載許可）
+- お問い合わせフォームの送信先（Tally / Formspree 等への接続）
+- プライバシーポリシー本文の法務確認
+- Google Maps embed の本番 URL 差し込み（雛形は仕込み済み）
+
+---
+
 ## 2026-05-18 — 渡邉設備 LP 更新（design_handoff 反映）
 
 `design_handoff_lp_updates/` パッケージを受領し、README の手順に従って main へ反映。

@@ -1,0 +1,2651 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>配管拾い出し集計ツール v3</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #f0f2f5;
+  --surface: #ffffff;
+  --border: #d4d8dd;
+  --border-light: #e8ecef;
+  --text: #1a1d21;
+  --text-muted: #6b7280;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-light: #dbeafe;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --success: #16a34a;
+  --success-light: #dcfce7;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --node-branch: #2563eb;
+  --node-equipment: #dc2626;
+  --node-meter: #16a34a;
+  --node-end: #6b7280;
+  --node-valve: #d97706;
+  --radius: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Noto Sans JP', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+/* Layout: left=input, right=drawing, resizable divider */
+.app { display: flex; height: 100vh; }
+.left-pane { width: 55%; min-width: 280px; max-width: 80%; display: flex; flex-direction: column; overflow: hidden; }
+.right-pane { flex: 1; min-width: 250px; display: flex; flex-direction: column; background: var(--surface); }
+
+/* Resizable divider */
+.divider {
+  width: 6px; cursor: col-resize; background: var(--border);
+  position: relative; flex-shrink: 0; z-index: 10;
+  transition: background 0.15s;
+}
+.divider:hover, .divider.active { background: var(--accent); }
+.divider::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px; height: 32px; border-radius: 1px;
+  background: rgba(255,255,255,0.6);
+}
+
+/* Header */
+.app-header { height: 44px; background: #1e293b; color: #fff; display: flex; align-items: center; padding: 0 16px; font-weight: 700; font-size: 14px; letter-spacing: 0.02em; flex-shrink: 0; }
+.app-header span { opacity: 0.5; font-weight: 400; margin-left: 8px; font-size: 12px; }
+
+/* Toolbar */
+.toolbar { padding: 8px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; background: #fafbfc; flex-shrink: 0; }
+.toolbar input[type="file"] { font-size: 12px; }
+.toolbar .mode-btns { display: flex; gap: 4px; margin-left: auto; }
+.mode-btn { padding: 5px 12px; font-size: 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); cursor: pointer; color: var(--text); transition: all 0.15s; }
+.mode-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.mode-btn:hover:not(.active) { background: var(--accent-light); }
+.toolbar-toggle { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; font-size: 11px; color: var(--text-muted); cursor: pointer; user-select: none; }
+.toolbar-toggle input { accent-color: var(--accent); cursor: pointer; }
+
+/* Canvas */
+.canvas-wrap { flex: 1; position: relative; overflow: auto; background: #e5e7eb; cursor: crosshair; }
+.canvas-wrap canvas { display: block; }
+.canvas-info { position: absolute; bottom: 8px; left: 8px; font-size: 11px; color: var(--text-muted); background: rgba(255,255,255,0.85); padding: 3px 8px; border-radius: 4px; pointer-events: none; }
+
+/* Right pane tabs */
+.tab-bar { display: flex; background: #fafbfc; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.tab-btn { padding: 10px 18px; font-size: 13px; font-weight: 500; border: none; background: none; cursor: pointer; color: var(--text-muted); border-bottom: 2px solid transparent; transition: all 0.15s; }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn:hover:not(.active) { color: var(--text); }
+.tab-content { flex: 1; overflow-y: auto; padding: 16px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Forms */
+.form-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow); }
+.form-title { font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.form-title::before { content: ''; width: 3px; height: 16px; background: var(--accent); border-radius: 2px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.form-grid.g2 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.form-group { display: flex; flex-direction: column; min-width: 0; }
+.form-group.span2 { grid-column: span 2; }
+.form-group.span3 { grid-column: 1 / -1; }
+.form-group > select, .form-group > input { width: 100%; min-width: 0; }
+@media (max-width: 360px) {
+  .form-grid, .form-grid.g2 { grid-template-columns: 1fr; }
+  .form-group.span2 { grid-column: 1 / -1; }
+}
+.form-group label { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; font-weight: 500; }
+.form-group label .badge { font-size: 9px; background: var(--accent-light); color: var(--accent); padding: 1px 5px; border-radius: 3px; margin-left: 4px; }
+.form-group select, .form-group input { padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: inherit; background: var(--surface); transition: border-color 0.15s; }
+.form-group select:focus, .form-group input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+
+/* Checkbox group */
+.checkbox-row { display: flex; flex-wrap: wrap; gap: 6px 12px; padding: 4px 0; }
+.checkbox-row label { font-size: 12px; display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text); }
+.checkbox-row input[type="checkbox"] { accent-color: var(--accent); }
+
+/* Valve inline editor */
+.valve-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.valve-tag { display: inline-flex; align-items: center; gap: 4px; background: var(--warning-light); color: var(--warning); font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 500; }
+.valve-tag .remove { cursor: pointer; font-weight: 700; opacity: 0.7; }
+.valve-tag .remove:hover { opacity: 1; }
+
+/* Via-node inline editor (optional route waypoints) */
+.via-details { margin-top: 2px; }
+.via-details-summary { cursor: pointer; font-size: 11px; color: var(--text-muted); font-weight: 500; user-select: none; padding: 2px 0; }
+.via-details[open] .via-details-summary { color: var(--text); }
+.via-controls { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+.via-node-tag { display: inline-flex; align-items: center; gap: 4px; background: var(--accent-light); color: var(--accent); font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 500; }
+.via-node-tag .move { cursor: pointer; font-weight: 700; opacity: 0.7; font-size: 10px; }
+.via-node-tag .move:hover { opacity: 1; }
+.via-node-tag .remove { cursor: pointer; font-weight: 700; opacity: 0.7; }
+.via-node-tag .remove:hover { opacity: 1; }
+.via-preview { margin-top: 6px; font-size: 11px; color: var(--text-muted); min-height: 1em; }
+
+/* Buttons */
+.btn { padding: 8px 16px; font-size: 13px; font-family: inherit; font-weight: 500; border: none; border-radius: var(--radius); cursor: pointer; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: #f3f4f6; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #b91c1c; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; flex-wrap: wrap; }
+
+/* Tables */
+.summary-label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin: 16px 0 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 12px; }
+th { background: #f8f9fa; font-weight: 600; font-size: 11px; color: var(--text-muted); text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+td { padding: 7px 10px; border-bottom: 1px solid var(--border-light); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8faff; }
+td .actions { display: flex; gap: 4px; }
+
+/* Edge list */
+.edge-row { display: flex; align-items: center; padding: 8px 10px; border-bottom: 1px solid var(--border-light); font-size: 12px; gap: 8px; }
+.edge-row:hover { background: #f8faff; }
+.edge-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); font-weight: 500; min-width: 30px; }
+.edge-detail { flex: 1; }
+.edge-route { font-weight: 500; }
+.edge-attrs { color: var(--text-muted); font-size: 11px; margin-top: 2px; }
+
+/* Node list in left pane */
+.node-list-header { padding: 6px 12px; font-size: 11px; font-weight: 600; color: var(--text-muted); background: #fafbfc; border-top: 1px solid var(--border); cursor: pointer; user-select: none; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.node-list-header:hover { background: #f0f2f5; color: var(--text); }
+.node-list-header .arrow { display: inline-block; width: 10px; text-align: center; transition: transform 0.15s; }
+.node-list-header.collapsed .arrow { transform: rotate(-90deg); }
+.node-list-header .count { margin-left: auto; background: var(--border-light); color: var(--text); padding: 1px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+.node-list-pane { max-height: 160px; overflow-y: auto; background: #fafbfc; flex-shrink: 0; }
+.node-list-pane.collapsed { display: none; }
+
+/* --- Scale calibration UI --- */
+.scale-toolbar { padding: 5px 12px; border-bottom: 1px solid var(--border); background: #f8fafc; display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; font-size: 11px; flex-shrink: 0; }
+.scale-toolbar.picking { background: #fef3c7; border-color: #f59e0b; }
+.scale-toolbar .scale-btn { padding: 3px 10px; font-size: 11px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); cursor: pointer; color: var(--text); font-family: inherit; }
+.scale-toolbar .scale-btn:hover:not(:disabled) { background: var(--accent-light); }
+.scale-toolbar .scale-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.scale-toolbar .scale-status { color: var(--text-muted); font-weight: 500; }
+.scale-toolbar.set .scale-status { color: var(--accent); }
+.scale-toolbar.picking .scale-status { color: #92400e; font-weight: 700; }
+.scale-toolbar .scale-hint { color: var(--text-muted); font-size: 10px; flex: 1 1 auto; min-width: 0; }
+.scale-toolbar .scale-input { display: inline-flex; align-items: center; gap: 4px; }
+.scale-toolbar .scale-input input { padding: 3px 6px; font-size: 11px; border: 1px solid var(--border); border-radius: var(--radius); font-family: inherit; }
+.scale-toolbar .scale-input select { padding: 3px 4px; font-size: 11px; border: 1px solid var(--border); border-radius: var(--radius); font-family: inherit; }
+
+/* Auto-length helper button under 長さ(m) input */
+.auto-len-btn { margin-top: 4px; padding: 3px 8px; font-size: 10px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text-muted); cursor: pointer; font-family: inherit; text-align: left; }
+.auto-len-btn:hover:not(:disabled) { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+.auto-len-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.auto-len-btn.ready { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+/* Click-to-place pending state for the node-form submit button */
+.btn.btn-pending { background: #fef3c7 !important; color: #92400e !important; border: 1px solid #f59e0b !important; cursor: progress; opacity: 1 !important; }
+.node-item { display: flex; align-items: center; padding: 5px 12px; font-size: 12px; gap: 6px; border-bottom: 1px solid var(--border-light); }
+.node-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.node-item .node-label { flex: 1; }
+.node-item .node-label.editable { cursor: text; padding: 2px 4px; border-radius: 3px; }
+.node-item .node-label.editable:hover { background: var(--accent-light); }
+.node-item .node-label-input { flex: 1; min-width: 0; font-family: inherit; font-size: 12px; padding: 2px 6px; border: 1px solid var(--accent); border-radius: 3px; outline: none; background: #fff; box-shadow: 0 0 0 2px var(--accent-light); }
+.node-item .node-type { font-size: 10px; color: var(--text-muted); }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 13px; }
+.empty-state .icon { font-size: 32px; margin-bottom: 8px; }
+
+/* Toast */
+.toast { position: fixed; bottom: 20px; right: 20px; background: #1e293b; color: #fff; padding: 10px 20px; border-radius: var(--radius); font-size: 13px; box-shadow: var(--shadow-md); z-index: 999; opacity: 0; transform: translateY(10px); transition: all 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* --- UX patch (v3.1 minimal) --- */
+.workflow-steps { display: flex; gap: 4px; flex-wrap: wrap; align-items: center;
+  padding: 8px 12px; margin: 0 0 10px; font-size: 11px; color: var(--text-muted);
+  background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius); }
+.workflow-steps .step { padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+.workflow-steps .step.active { background: var(--accent); color: #fff; font-weight: 600; }
+.workflow-steps .sep { opacity: .5; padding: 0 2px; }
+.state-bar { display: flex; gap: 14px; flex-wrap: wrap; align-items: baseline;
+  padding: 8px 12px; margin-bottom: 12px; font-size: 12px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.state-bar .label { color: var(--text-muted); }
+.state-bar .val { font-weight: 600; margin-left: 4px; }
+.state-bar .latest { flex: 1 1 auto; min-width: 180px; }
+.state-bar .hint { width: 100%; color: var(--text-muted); font-style: italic; font-size: 11px; }
+.form-subtitle { font-size: 11px; color: var(--text-muted); margin: -6px 0 10px; }
+.field-help { display: block; font-size: 10px; color: var(--text-muted); margin-top: 3px; line-height: 1.35; }
+.handoff-badge { display: inline-block; margin-left: 6px; padding: 1px 6px; font-size: 10px;
+  color: #0369a1; background: #e0f2fe; border-radius: 8px; font-weight: 500; }
+.handoff-badge[hidden] { display: none; }
+.empty-state .hint { display: block; margin-top: 6px; font-size: 11px; opacity: .85; line-height: 1.5; }
+
+/* --- Work Estimate tab (v4) --- */
+.work-estimate-grid { display: flex; flex-direction: column; gap: 18px; }
+.we-section { background: var(--bg-elevated, #fff); border: 1px solid var(--border, #e2e8f0); border-radius: 8px; padding: 12px; }
+.we-section h3 { margin: 0 0 10px; font-size: 13px; color: var(--text-strong, #1e293b); font-weight: 600; }
+.we-section .we-note { font-size: 11px; color: var(--text-muted, #64748b); margin: 0 0 8px; line-height: 1.45; }
+.we-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.we-table th, .we-table td { padding: 6px 8px; border-bottom: 1px solid var(--border-light, #eef2f7); }
+.we-table th { text-align: left; font-weight: 600; color: var(--text-muted, #64748b); background: var(--bg-soft, #f8fafc); }
+.we-table input[type="number"] { width: 80px; padding: 4px 6px; font-size: 12px; text-align: right; }
+.we-table td.num-cell { text-align: right; font-variant-numeric: tabular-nums; }
+.we-table .we-total-row td { font-weight: 700; background: var(--bg-soft, #f8fafc); border-top: 2px solid var(--border, #e2e8f0); }
+.we-table .we-support-auto { color: var(--text-muted, #64748b); font-size: 11px; margin-left: 4px; }
+.we-actions { margin-top: 6px; display: flex; justify-content: flex-end; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- LEFT PANE: INPUT & TABLES -->
+  <div class="left-pane">
+    <div class="app-header">配管拾い出し集計ツール<span>v4</span></div>
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="input" onclick="switchTab('input')">入力</button>
+      <button class="tab-btn" data-tab="edges" onclick="switchTab('edges')">区間一覧</button>
+      <button class="tab-btn" data-tab="summary" onclick="switchTab('summary')">集計結果</button>
+      <button class="tab-btn" data-tab="export" onclick="switchTab('export')">出力</button>
+      <button class="tab-btn" data-tab="work" onclick="switchTab('work')">作業見積</button>
+    </div>
+    <div class="tab-content">
+
+      <!-- TAB: INPUT -->
+      <div class="tab-panel active" id="tab-input">
+        <!-- Workflow stepper (dynamic highlight) -->
+        <div class="workflow-steps" id="workflowSteps">
+          <span class="step" data-step="1">① 図面を読込</span>
+          <span class="sep">→</span>
+          <span class="step" data-step="2">② ノード配置</span>
+          <span class="sep">→</span>
+          <span class="step" data-step="3">③ 区間を確定</span>
+          <span class="sep">→</span>
+          <span class="step" data-step="4">④ CSV 出力</span>
+        </div>
+        <!-- Current state bar -->
+        <div class="state-bar" id="stateBar">
+          <div><span class="label">ノード:</span><span class="val" id="stateNodes">0</span></div>
+          <div><span class="label">区間:</span><span class="val" id="stateEdges">0</span></div>
+          <div class="latest"><span class="label">最新区間:</span><span class="val" id="stateLatest">—</span></div>
+          <div class="hint" id="stateHint">次にやること: 図面を読み込んでください</div>
+        </div>
+        <!-- Node Form -->
+        <div class="form-section">
+          <div class="form-title">ノード登録</div>
+          <div class="form-subtitle">図面上クリックでも追加できます。ここでは手入力で追加します。</div>
+          <div class="form-grid g2">
+            <div class="form-group">
+              <label>ラベル</label>
+              <input type="text" id="node-label" placeholder="例: メーター、分岐A、給湯器">
+            </div>
+            <div class="form-group">
+              <label>種類</label>
+              <select id="node-type">
+                <option value="分岐点">分岐点</option>
+                <option value="継手">継手</option>
+                <option value="メーター">メーター</option>
+                <option value="機器接続">機器接続</option>
+                <option value="末端">末端</option>
+                <option value="バルブ設置点">バルブ設置点</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-secondary btn-sm" onclick="addNodeFromForm()">ノードを登録</button>
+          </div>
+        </div>
+
+        <!-- Edge Form -->
+        <div class="form-section">
+          <div class="form-title">区間（エッジ）登録</div>
+          <div class="form-subtitle">2 つのノードをつないで 1 区間。前区間の終点は次の始点に自動で引き継がれます。</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>始点ノード<span id="from-handoff-badge" class="handoff-badge" hidden>前区間から引き継ぎ</span></label>
+              <select id="edge-from"></select>
+            </div>
+            <div class="form-group">
+              <label>終点ノード</label>
+              <select id="edge-to"></select>
+            </div>
+            <div class="form-group">
+              <label>長さ (m)</label>
+              <input type="number" id="edge-length" step="0.1" placeholder="2.5">
+              <button type="button" class="auto-len-btn" id="autoLenBtn" onclick="applyAutoLength()" disabled title="縮尺設定済みなら、選択中の始点・終点間距離を自動計算して長さ欄に入れます">自動計算: 縮尺未設定</button>
+            </div>
+            <div class="form-group">
+              <label>系統 <span class="badge">保持</span></label>
+              <input type="text" id="edge-system" value="ガス配管">
+            </div>
+            <div class="form-group">
+              <label>管種 <span class="badge">保持</span></label>
+              <select id="edge-material">
+                <option value="SGP（白）">SGP（白）</option>
+                <option value="SGP（黒）">SGP（黒）</option>
+                <option value="PLV-VA">PLV-VA</option>
+                <option value="PLV-VB">PLV-VB</option>
+                <option value="PLV-VD">PLV-VD</option>
+                <option value="SUS">SUS</option>
+                <option value="被覆鋼管">被覆鋼管</option>
+                <option value="フレキ管">フレキ管</option>
+                <option value="MF">MF（メタルフレキ）</option>
+                <option value="PE管">PE管</option>
+                <option value="VP">VP</option>
+                <option value="HIVP">HIVP</option>
+                <option value="銅管">銅管</option>
+                <option value="耐火二層管">耐火二層管</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>口径 <span class="badge">保持</span></label>
+              <select id="edge-diameter">
+                <option value="13A">13A</option>
+                <option value="15A">15A</option>
+                <option value="20A" selected>20A</option>
+                <option value="25A">25A</option>
+                <option value="32A">32A</option>
+                <option value="40A">40A</option>
+                <option value="50A">50A</option>
+                <option value="65A">65A</option>
+                <option value="75A">75A</option>
+                <option value="80A">80A</option>
+                <option value="100A">100A</option>
+                <option value="125A">125A</option>
+                <option value="150A">150A</option>
+                <option value="200A">200A</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>方向 <span class="badge">保持</span></label>
+              <select id="edge-direction">
+                <option value="横引き">横引き</option>
+                <option value="立上り">立上り</option>
+                <option value="立下り">立下り</option>
+              </select>
+              <small class="field-help">横引き=水平 / 立上り=下から上 / 立下り=上から下</small>
+            </div>
+            <div class="form-group">
+              <label>施工場所 <span class="badge">保持</span></label>
+              <select id="edge-location">
+                <option value="屋内露出">屋内露出</option>
+                <option value="屋内隠蔽">屋内隠蔽</option>
+                <option value="屋外露出">屋外露出</option>
+                <option value="屋外埋設">屋外埋設</option>
+                <option value="機械室">機械室</option>
+                <option value="シャフト内">シャフト内</option>
+                <option value="ピット内">ピット内</option>
+                <option value="コンクリート埋設">コンクリート埋設</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>メモ</label>
+              <input type="text" id="edge-memo" placeholder="">
+            </div>
+            <div class="form-group span3">
+              <label>バルブ類</label>
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                <select id="valve-type-sel">
+                  <option value="">-- 追加 --</option>
+                  <option value="ガス栓">ガス栓</option>
+                  <option value="ボール弁">ボール弁</option>
+                  <option value="ゲート弁">ゲート弁</option>
+                  <option value="チャッキ弁">チャッキ弁</option>
+                  <option value="ストレーナ">ストレーナ</option>
+                  <option value="減圧弁">減圧弁</option>
+                  <option value="安全弁">安全弁</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" onclick="addValveTag()">＋</button>
+                <div class="valve-list" id="valveTags"></div>
+              </div>
+            </div>
+            <div class="form-group span3">
+              <details id="via-nodes-details" class="via-details">
+                <summary class="via-details-summary">▶ 経由ノード（任意）</summary>
+                <div class="via-controls">
+                  <select id="via-node-sel"></select>
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="addViaNodeTag()">＋</button>
+                  <div class="valve-list" id="viaNodeTags"></div>
+                </div>
+                <div class="via-preview" id="viaPreview"></div>
+              </details>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-danger btn-sm" id="btnDeleteEdge" onclick="deleteSelectedEdge()" disabled title="「ノード選択」モードで区間線をクリックしてから押してください">選択した区間を削除</button>
+            <button class="btn btn-secondary" onclick="undoLastEdge()">↩ 元に戻す</button>
+            <button class="btn btn-primary" onclick="addEdge()">区間を確定 →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: EDGE LIST -->
+      <div class="tab-panel" id="tab-edges">
+        <div class="form-section" style="padding:0;overflow:hidden;">
+          <div id="edgeListContainer">
+            <div class="empty-state"><div class="icon">📋</div>まだ区間がありません<span class="hint">「入力」タブで始点・終点・長さを入力し『区間を確定 →』を押すと、ここに一覧されます</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: SUMMARY -->
+      <div class="tab-panel" id="tab-summary">
+        <div class="form-section">
+          <div class="form-title">所要係数</div>
+          <div class="form-grid g2">
+            <div class="form-group">
+              <label>所要係数（ロス率）</label>
+              <input type="number" id="loss-factor" value="1.05" step="0.01" onchange="updateSummary()">
+            </div>
+            <div class="form-group">
+              <label>定尺長さ (m)</label>
+              <input type="number" id="standard-length" value="4" step="0.5" onchange="updateSummary()">
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-label">テーブル1：直管集計</div>
+        <table id="tbl-pipe"><thead><tr><th>系統</th><th>管種</th><th>口径</th><th>施工場所</th><th>合計(m)</th><th>定尺本数</th><th>所要数量</th></tr></thead><tbody></tbody></table>
+
+        <div class="summary-label">テーブル2：継手集計（自動推定）</div>
+        <table id="tbl-fitting"><thead><tr><th>系統</th><th>管種</th><th>口径</th><th>種類</th><th>数量</th></tr></thead><tbody></tbody></table>
+
+        <div class="summary-label">テーブル3：バルブ類集計</div>
+        <table id="tbl-valve"><thead><tr><th>系統</th><th>種類</th><th>口径</th><th>数量</th></tr></thead><tbody></tbody></table>
+
+        <div class="summary-label">テーブル4：接続機器一覧</div>
+        <table id="tbl-equip"><thead><tr><th>ノードID</th><th>機器名</th><th>接続管種</th><th>接続口径</th><th>系統</th></tr></thead><tbody></tbody></table>
+      </div>
+
+      <!-- TAB: EXPORT -->
+      <div class="tab-panel" id="tab-export">
+        <div class="form-section">
+          <div class="form-title">エクスポート</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">データを各形式でダウンロードできます。JSONはGAS連携用の完全データ、CSVは積算用の集計テーブルです。</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <button class="btn btn-primary" onclick="exportJSON()" style="justify-content:center;">ネットワークJSON出力（GAS連携用）</button>
+            <button class="btn btn-secondary" onclick="exportCSV('pipe')" style="justify-content:center;">直管集計CSV</button>
+            <button class="btn btn-secondary" onclick="exportCSV('fitting')" style="justify-content:center;">継手集計CSV</button>
+            <button class="btn btn-secondary" onclick="exportCSV('valve')" style="justify-content:center;">バルブ類CSV</button>
+            <button class="btn btn-secondary" onclick="exportCSV('all')" style="justify-content:center;">全集計テーブル統合CSV</button>
+            <button class="btn btn-secondary" onclick="exportCSV('edges')" style="justify-content:center;">エッジ生データCSV</button>
+            <button class="btn btn-secondary" onclick="exportCSV('bukake')" style="justify-content:center;">歩掛連携CSV</button>
+          </div>
+          <hr style="margin:20px 0;border:none;border-top:1px solid var(--border);">
+          <div class="form-title">データ管理</div>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-danger btn-sm" onclick="clearAllData()">全データクリア</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: WORK ESTIMATE (v4) -->
+      <div class="tab-panel" id="tab-work">
+        <div class="work-estimate-grid">
+          <div class="we-section">
+            <h3>歩掛マスター（管種区分別）</h3>
+            <p class="we-note">1m あたりの工数 = 施工係数 × 基準時間(分)。金額 = 工数 ÷ 15 × 単価。</p>
+            <table class="we-table" id="weMaterialTable">
+              <thead>
+                <tr><th>管種区分</th><th>施工係数</th><th>基準時間 (分/1m)</th><th>単価 (円/15分)</th></tr>
+              </thead>
+              <tbody>
+                <tr data-key="pvc"><td>塩ビ管（糊付）</td>
+                  <td class="num-cell"><input type="number" step="0.01" min="0" data-field="factor" data-key="pvc" onchange="onWorkEstimateInputChange()"></td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="baseMin" data-key="pvc" onchange="onWorkEstimateInputChange()"></td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="unitPrice" data-key="pvc" onchange="onWorkEstimateInputChange()"></td>
+                </tr>
+                <tr data-key="ef"><td>電気融着専用パイプ</td>
+                  <td class="num-cell"><input type="number" step="0.01" min="0" data-field="factor" data-key="ef" onchange="onWorkEstimateInputChange()"></td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="baseMin" data-key="ef" onchange="onWorkEstimateInputChange()"></td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="unitPrice" data-key="ef" onchange="onWorkEstimateInputChange()"></td>
+                </tr>
+                <tr data-key="steel"><td>鉄管（ねじ切り・接合）</td>
+                  <td class="num-cell"><input type="number" step="0.01" min="0" data-field="factor" data-key="steel" onchange="onWorkEstimateInputChange()"></td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="baseMin" data-key="steel" onchange="onWorkEstimateInputChange()"></td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="unitPrice" data-key="steel" onchange="onWorkEstimateInputChange()"></td>
+                </tr>
+                <tr data-key="other"><td>その他（デフォルト）</td>
+                  <td class="num-cell"><input type="number" step="0.01" min="0" data-field="factor" data-key="other" onchange="onWorkEstimateInputChange()"></td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="baseMin" data-key="other" onchange="onWorkEstimateInputChange()"></td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="unitPrice" data-key="other" onchange="onWorkEstimateInputChange()"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="we-section">
+            <h3>付帯作業</h3>
+            <p class="we-note">支持台は配管総長 1m ごとに 1 台で自動算出（切り上げ）。追加分を加算できます。</p>
+            <table class="we-table" id="weAuxTable">
+              <thead>
+                <tr><th>作業種別</th><th>数量</th><th>単位</th><th>基準時間 (分/単位)</th><th>単価 (円/15分)</th></tr>
+              </thead>
+              <tbody>
+                <tr data-key="anchor">
+                  <td>天井アンカー設置</td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="qty" data-key="anchor" onchange="onWorkEstimateInputChange()"></td>
+                  <td>箇所</td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="baseMin" data-key="anchor" onchange="onWorkEstimateInputChange()"></td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="unitPrice" data-key="anchor" onchange="onWorkEstimateInputChange()"></td>
+                </tr>
+                <tr data-key="support">
+                  <td>支持台固定<span class="we-support-auto" id="weSupportAuto">（自動: 0 台）</span></td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="additionalQty" data-key="support" placeholder="追加分" onchange="onWorkEstimateInputChange()"></td>
+                  <td>台</td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="baseMin" data-key="support" onchange="onWorkEstimateInputChange()"></td>
+                  <td class="num-cell"><input type="number" step="1" min="0" data-field="unitPrice" data-key="support" onchange="onWorkEstimateInputChange()"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="we-section">
+            <h3>作業工数・金額プレビュー</h3>
+            <p class="we-note">区間データ（edges）と上記マスターから自動計算。人工＝工数(分) ÷ 480（8h）。</p>
+            <table class="we-table" id="wePreviewTable">
+              <thead>
+                <tr>
+                  <th>作業区分</th>
+                  <th>管種or内容</th>
+                  <th>数量</th>
+                  <th>単位</th>
+                  <th>係数</th>
+                  <th>工数 (分)</th>
+                  <th>人工</th>
+                  <th>金額 (円)</th>
+                </tr>
+              </thead>
+              <tbody id="wePreviewBody"></tbody>
+            </table>
+            <div class="we-actions">
+              <button class="btn btn-primary" onclick="exportWorkEstimateCSV()">作業見積 CSV を出力</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESIZABLE DIVIDER -->
+  <div class="divider" id="divider"></div>
+
+  <!-- RIGHT PANE: DRAWING / CANVAS -->
+  <div class="right-pane">
+    <div class="toolbar">
+      <input type="file" id="imageLoader" accept="image/*">
+      <div class="mode-btns">
+        <button class="mode-btn active" data-mode="node" onclick="setMode('node')">ノード追加</button>
+        <button class="mode-btn" data-mode="select" onclick="setMode('select')">ノード選択</button>
+        <button class="mode-btn" data-mode="pan" onclick="setMode('pan')">パン</button>
+      </div>
+      <label class="toolbar-toggle" title="キャンバス上のノード名表示を切替">
+        <input type="checkbox" id="toggleLabels" checked onchange="toggleNodeLabels(this.checked)">
+        <span>ノード名</span>
+      </label>
+      <span id="zoomDisplay" style="margin-left:auto;font-size:11px;color:var(--text-muted);">100%</span>
+    </div>
+    <div class="scale-toolbar" id="scaleToolbar">
+      <button type="button" class="scale-btn" id="btnScalePick" onclick="startScalePickMode()">縮尺設定</button>
+      <button type="button" class="scale-btn" id="btnScaleReset" onclick="resetScale()" disabled>縮尺リセット</button>
+      <span class="scale-status" id="scaleStatus">縮尺: 未設定</span>
+      <span class="scale-hint" id="scaleHint">図面上の既知寸法の2点をクリック → 実寸を入力</span>
+      <span class="scale-input" id="scaleInput" hidden>
+        <input type="number" id="scaleValue" placeholder="2500" step="0.001" min="0" style="width:90px;">
+        <select id="scaleUnit">
+          <option value="mm">mm</option>
+          <option value="m">m</option>
+        </select>
+        <button type="button" class="scale-btn" onclick="confirmScaleInput()">設定</button>
+        <button type="button" class="scale-btn" onclick="cancelScalePick()">キャンセル</button>
+      </span>
+    </div>
+    <div class="canvas-wrap" id="canvasWrap">
+      <canvas id="mainCanvas"></canvas>
+      <div class="canvas-info" id="canvasInfo">図面エリア — 画像を読み込んでノードをクリックで配置</div>
+    </div>
+    <div class="node-list-header" id="nodeListHeader" onclick="toggleNodeListPane()" title="クリックで開閉">
+      <span class="arrow">▼</span>
+      <span>ノード一覧</span>
+      <span class="count" id="nodeListCount">0</span>
+    </div>
+    <div class="node-list-pane" id="nodeListPane">
+      <!-- node list rendered here -->
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== STATE =====
+let nodes = [];
+let edges = [];
+let edgeHistory = []; // for undo
+let nextNodeId = 1;
+let nextEdgeId = 1;
+let currentValves = []; // temp valve list for current edge input
+let currentViaNodeIds = []; // temp via-node list for current edge input (ordered waypoints)
+let canvasMode = 'node'; // 'node' | 'select' | 'pan'
+let panState = { dragging: false, startX: 0, startY: 0, scrollLeft: 0, scrollTop: 0 };
+let draggingNode = null; // node object currently being dragged (null when not dragging)
+let selectedNodeId = null; // id of the currently selected node in 'select' mode, or null
+let selectedEdgeId = null; // id of the currently selected edge in 'select' mode, or null
+let showNodeLabels = true; // canvas node label visibility (data unaffected)
+
+// Scale calibration: meters per pixel of the source image. null = unset.
+// 既存の nodes / edges スキーマや localStorage キー pipingToolData は触らず、
+// 別キー pipingScale でセッションをまたいで保持する。
+let scaleMPerPx = null;
+let scaleCalibration = null; // { p1:{x,y}, p2:{x,y}, realM, baselinePx } — for overlay & re-derivation
+let scalePickingMode = false;
+let scalePickPoints = [];    // up to 2 image-coord points collected during picking
+
+// Click-to-place pending node: when user submits the node form, we hold off
+// pushing the node until the next canvas click determines its position.
+// Shape: null | { label, type }
+let pendingNodePlacement = null;
+let zoomLevel = 1.0;
+const ZOOM_MIN = 0.2;
+const ZOOM_MAX = 5.0;
+const ZOOM_STEP = 0.1;
+
+// ===== CANVAS =====
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+const canvasWrap = document.getElementById('canvasWrap');
+let baseImage = new Image();
+let imageLoaded = false;
+
+document.getElementById('imageLoader').onchange = function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    baseImage.onload = function() {
+      imageLoaded = true;
+      zoomLevel = 1.0;
+      applyZoom();
+      redrawCanvas();
+      document.getElementById('canvasInfo').textContent =
+        `${baseImage.width}×${baseImage.height}px | クリック: ノード追加 / ピンチ: ズーム`;
+      renderUxHints();
+    };
+    baseImage.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+function applyZoom() {
+  if (!imageLoaded) return;
+  canvas.width = baseImage.width * zoomLevel;
+  canvas.height = baseImage.height * zoomLevel;
+  document.getElementById('zoomDisplay').textContent = Math.round(zoomLevel * 100) + '%';
+  redrawCanvas();
+}
+
+function setMode(mode) {
+  canvasMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  if (mode === 'node') canvasWrap.style.cursor = 'crosshair';
+  else if (mode === 'select') canvasWrap.style.cursor = 'default';
+  else canvasWrap.style.cursor = 'grab';
+  // Leaving select mode clears the current selection.
+  if (mode !== 'select') {
+    if (selectedNodeId !== null) selectedNodeId = null;
+    if (selectedEdgeId !== null) { selectedEdgeId = null; updateDeleteEdgeBtn(); }
+  }
+  redrawCanvas();
+}
+
+function toggleNodeLabels(on) {
+  showNodeLabels = !!on;
+  redrawCanvas();
+}
+
+function toggleNodeListPane() {
+  const pane = document.getElementById('nodeListPane');
+  const header = document.getElementById('nodeListHeader');
+  const collapsed = pane.classList.toggle('collapsed');
+  header.classList.toggle('collapsed', collapsed);
+}
+
+// Canvas click -> add node
+// Hit test: return the topmost node whose center is within hit-radius of (ix, iy).
+// ix, iy are in image coordinates (pre-zoom).
+function getNodeAtPosition(ix, iy) {
+  if (!imageLoaded || nodes.length === 0) return null;
+  const hitR = Math.max(10, baseImage.width * 0.007);
+  const hitR2 = hitR * hitR;
+  for (let i = nodes.length - 1; i >= 0; i--) {
+    const n = nodes[i];
+    const dx = n.x - ix;
+    const dy = n.y - iy;
+    if (dx * dx + dy * dy <= hitR2) return n;
+  }
+  return null;
+}
+
+// Hit test: return the topmost edge whose line segment passes within hitR of (ix, iy).
+// Point-to-segment distance, image coordinates.
+function findEdgeNearPoint(ix, iy) {
+  if (!imageLoaded || edges.length === 0) return null;
+  const hitR = Math.max(6, baseImage.width * 0.005);
+  const hitR2 = hitR * hitR;
+  for (let i = edges.length - 1; i >= 0; i--) {
+    const e = edges[i];
+    const a = nodes.find(n => n.id === e.fromNode);
+    const b = nodes.find(n => n.id === e.toNode);
+    if (!a || !b) continue;
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const len2 = dx * dx + dy * dy;
+    if (len2 === 0) continue;
+    let t = ((ix - a.x) * dx + (iy - a.y) * dy) / len2;
+    if (t < 0) t = 0; else if (t > 1) t = 1;
+    const px = a.x + t * dx;
+    const py = a.y + t * dy;
+    const ddx = ix - px;
+    const ddy = iy - py;
+    if (ddx * ddx + ddy * ddy <= hitR2) return e;
+  }
+  return null;
+}
+
+function selectEdge(id) {
+  selectedEdgeId = id;
+  selectedNodeId = null;
+  updateDeleteEdgeBtn();
+  redrawCanvas();
+}
+
+function deleteSelectedEdge() {
+  if (selectedEdgeId == null) return;
+  const id = selectedEdgeId;
+  selectedEdgeId = null;
+  edges = edges.filter(e => e.id !== id);
+  renderEdgeList();
+  updateSummary();
+  redrawCanvas();
+  saveToStorage();
+  renderUxHints();
+  updateDeleteEdgeBtn();
+  maybeRecalcWorkEstimate();
+  showToast(`区間 E${id} を削除`);
+}
+
+function updateDeleteEdgeBtn() {
+  const btn = document.getElementById('btnDeleteEdge');
+  if (!btn) return;
+  btn.disabled = (selectedEdgeId == null);
+}
+
+canvas.addEventListener('mousedown', function(e) {
+  // Scale picking mode: highest priority. Hijacks click before pan / node / select branches.
+  if (scalePickingMode) {
+    if (!imageLoaded) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / zoomLevel;
+    const y = (e.clientY - rect.top) / zoomLevel;
+    handleScalePickClick(x, y);
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+  // Click-to-place pending: 2nd highest priority. Place the form-submitted node here.
+  if (pendingNodePlacement && imageLoaded) {
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / zoomLevel;
+    const y = (e.clientY - rect.top) / zoomLevel;
+    const { label, type } = pendingNodePlacement;
+    pendingNodePlacement = null;
+    if (canvasMode === 'node') canvasWrap.style.cursor = 'crosshair';
+    else if (canvasMode === 'select') canvasWrap.style.cursor = 'default';
+    else canvasWrap.style.cursor = 'grab';
+    placeNodeAt(label, type, x, y);
+    updatePendingNodeUi();
+    e.preventDefault();
+    e.stopPropagation();
+    return;
+  }
+  if (canvasMode === 'pan') {
+    panState.dragging = true;
+    panState.startX = e.clientX;
+    panState.startY = e.clientY;
+    panState.scrollLeft = canvasWrap.scrollLeft;
+    panState.scrollTop = canvasWrap.scrollTop;
+    canvasWrap.style.cursor = 'grabbing';
+    return;
+  }
+
+  if (!imageLoaded) return;
+
+  const rect = canvas.getBoundingClientRect();
+  // Convert screen coords to image coords (accounting for zoom)
+  const x = (e.clientX - rect.left) / zoomLevel;
+  const y = (e.clientY - rect.top) / zoomLevel;
+
+  if (canvasMode === 'select') {
+    // Select mode: node hit → select + drag. Else edge hit → select edge.
+    // Else → clear both selections.
+    const hit = getNodeAtPosition(x, y);
+    if (hit) {
+      selectedNodeId = hit.id;
+      selectedEdgeId = null;
+      draggingNode = hit;
+      canvasWrap.style.cursor = 'grabbing';
+      e.preventDefault();
+      e.stopPropagation();
+      updateDeleteEdgeBtn();
+      redrawCanvas();
+      return;
+    }
+    const edgeHit = findEdgeNearPoint(x, y);
+    if (edgeHit) {
+      selectEdge(edgeHit.id);
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    if (selectedNodeId !== null || selectedEdgeId !== null) {
+      selectedNodeId = null;
+      selectedEdgeId = null;
+      updateDeleteEdgeBtn();
+      redrawCanvas();
+    }
+    return;
+  }
+
+  if (canvasMode === 'node') {
+    // Node-add mode: clicking on an existing node is a no-op (no stacking,
+    // no drag — drag belongs to select mode). Empty space adds a new node.
+    const hit = getNodeAtPosition(x, y);
+    if (hit) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    const label = document.getElementById('node-label').value.trim() || ('N' + nextNodeId);
+    const type = document.getElementById('node-type').value;
+
+    nodes.push({ id: nextNodeId, label, type, x, y });
+    nextNodeId++;
+    renderNodeList();
+    updateNodeSelectors();
+    redrawCanvas();
+    saveToStorage();
+    showToast(`ノード「${label}」を追加`);
+    document.getElementById('node-label').value = '';
+    renderUxHints();
+  }
+});
+
+canvasWrap.addEventListener('mousemove', function(e) {
+  if (draggingNode) {
+    const rect = canvas.getBoundingClientRect();
+    draggingNode.x = (e.clientX - rect.left) / zoomLevel;
+    draggingNode.y = (e.clientY - rect.top) / zoomLevel;
+    redrawCanvas();
+    return;
+  }
+  if (canvasMode === 'pan' && panState.dragging) {
+    canvasWrap.scrollLeft = panState.scrollLeft - (e.clientX - panState.startX);
+    canvasWrap.scrollTop = panState.scrollTop - (e.clientY - panState.startY);
+  }
+});
+
+function endNodeDrag() {
+  if (!draggingNode) return;
+  draggingNode = null;
+  if (canvasMode === 'node') canvasWrap.style.cursor = 'crosshair';
+  else if (canvasMode === 'select') canvasWrap.style.cursor = 'default';
+  else canvasWrap.style.cursor = 'grab';
+  saveToStorage();
+  updateAutoLenBtn();
+}
+
+canvasWrap.addEventListener('mouseup', function() {
+  if (draggingNode) { endNodeDrag(); return; }
+  panState.dragging = false;
+  if (canvasMode === 'pan') canvasWrap.style.cursor = 'grab';
+});
+
+canvasWrap.addEventListener('mouseleave', function() {
+  if (draggingNode) endNodeDrag();
+  panState.dragging = false;
+});
+
+// ===== SCALE CALIBRATION =====
+// 縮尺は別 state + 別 localStorage キー（pipingScale）で管理。
+// nodes / edges / pipingToolData は一切触らない。
+function calcPixelDistance(p1, p2) {
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+function calcDistanceMFromPixels(px) {
+  if (scaleMPerPx == null || !isFinite(scaleMPerPx)) return null;
+  return px * scaleMPerPx;
+}
+
+function startScalePickMode() {
+  if (!imageLoaded) {
+    showToast('先に図面を読み込んでください');
+    return;
+  }
+  // If a pending node placement is active, drop it silently to avoid mode collision.
+  if (pendingNodePlacement) {
+    pendingNodePlacement = null;
+    updatePendingNodeUi();
+  }
+  scalePickingMode = true;
+  scalePickPoints = [];
+  document.getElementById('scaleInput').hidden = true;
+  document.getElementById('scaleToolbar').classList.add('picking');
+  document.getElementById('scaleToolbar').classList.remove('set');
+  canvasWrap.style.cursor = 'crosshair';
+  updateScaleUi();
+  redrawCanvas();
+  showToast('図面上で 1 点目をクリック');
+}
+
+function handleScalePickClick(ix, iy) {
+  scalePickPoints.push({ x: ix, y: iy });
+  redrawCanvas();
+  if (scalePickPoints.length === 1) {
+    showToast('2 点目をクリック');
+    updateScaleUi();
+  } else if (scalePickPoints.length === 2) {
+    // Reveal the inline value/unit input. ESC or キャンセル button aborts.
+    document.getElementById('scaleInput').hidden = false;
+    document.getElementById('scaleValue').focus();
+    updateScaleUi();
+  }
+}
+
+function confirmScaleInput() {
+  if (scalePickPoints.length !== 2) return;
+  const v = parseFloat(document.getElementById('scaleValue').value);
+  const unit = document.getElementById('scaleUnit').value;
+  if (!isFinite(v) || v <= 0) {
+    showToast('有効な実寸を入力してください');
+    return;
+  }
+  const realM = unit === 'mm' ? v / 1000 : v;
+  setScaleFromTwoPoints(scalePickPoints[0], scalePickPoints[1], realM);
+  // Exit picking mode (keep calibration overlay)
+  scalePickingMode = false;
+  scalePickPoints = [];
+  document.getElementById('scaleInput').hidden = true;
+  document.getElementById('scaleToolbar').classList.remove('picking');
+  document.getElementById('scaleToolbar').classList.add('set');
+  document.getElementById('scaleValue').value = '';
+  canvasWrap.style.cursor = canvasMode === 'node' ? 'crosshair'
+                          : canvasMode === 'select' ? 'default' : 'grab';
+  updateScaleUi();
+  updateAutoLenBtn();
+  saveScaleToStorage();
+  redrawCanvas();
+  showToast(`縮尺を設定: 1px = ${(scaleMPerPx * 1000).toFixed(3)}mm`);
+}
+
+function setScaleFromTwoPoints(p1, p2, realM) {
+  const px = calcPixelDistance(p1, p2);
+  if (px <= 0) {
+    scaleMPerPx = null;
+    scaleCalibration = null;
+    return;
+  }
+  scaleMPerPx = realM / px;
+  scaleCalibration = { p1: { x: p1.x, y: p1.y }, p2: { x: p2.x, y: p2.y }, realM: realM, baselinePx: px };
+}
+
+function cancelScalePick() {
+  scalePickingMode = false;
+  scalePickPoints = [];
+  document.getElementById('scaleInput').hidden = true;
+  document.getElementById('scaleToolbar').classList.remove('picking');
+  if (scaleMPerPx != null) document.getElementById('scaleToolbar').classList.add('set');
+  document.getElementById('scaleValue').value = '';
+  canvasWrap.style.cursor = canvasMode === 'node' ? 'crosshair'
+                          : canvasMode === 'select' ? 'default' : 'grab';
+  updateScaleUi();
+  redrawCanvas();
+}
+
+function resetScale() {
+  if (scaleMPerPx == null && scaleCalibration == null && !scalePickingMode) return;
+  scaleMPerPx = null;
+  scaleCalibration = null;
+  scalePickingMode = false;
+  scalePickPoints = [];
+  document.getElementById('scaleInput').hidden = true;
+  document.getElementById('scaleToolbar').classList.remove('picking');
+  document.getElementById('scaleToolbar').classList.remove('set');
+  canvasWrap.style.cursor = canvasMode === 'node' ? 'crosshair'
+                          : canvasMode === 'select' ? 'default' : 'grab';
+  try { localStorage.removeItem('pipingScale'); } catch(e) {}
+  updateScaleUi();
+  updateAutoLenBtn();
+  redrawCanvas();
+  showToast('縮尺をリセットしました');
+}
+
+function updateScaleUi() {
+  const status = document.getElementById('scaleStatus');
+  const hint = document.getElementById('scaleHint');
+  const btnReset = document.getElementById('btnScaleReset');
+  if (!status) return;
+  if (scalePickingMode) {
+    if (scalePickPoints.length === 0) status.textContent = '縮尺: 1 点目をクリック';
+    else if (scalePickPoints.length === 1) status.textContent = '縮尺: 2 点目をクリック';
+    else status.textContent = '縮尺: 実寸を入力';
+    if (hint) hint.textContent = 'ESC または「キャンセル」で中止';
+  } else if (scaleMPerPx != null && scaleCalibration) {
+    status.textContent = `縮尺: 設定済み（基準 ${scaleCalibration.realM.toFixed(3)}m / 1px = ${(scaleMPerPx * 1000).toFixed(3)}mm）`;
+    if (hint) hint.textContent = '区間登録で「自動計算」が使えます';
+  } else {
+    status.textContent = '縮尺: 未設定';
+    if (hint) hint.textContent = '図面上の既知寸法の2点をクリック → 実寸を入力';
+  }
+  if (btnReset) btnReset.disabled = (scaleMPerPx == null && scaleCalibration == null);
+}
+
+function updateAutoLenBtn() {
+  const btn = document.getElementById('autoLenBtn');
+  if (!btn) return;
+  btn.classList.remove('ready');
+  if (scaleMPerPx == null) {
+    btn.textContent = '自動計算: 縮尺未設定';
+    btn.disabled = true;
+    return;
+  }
+  const fromSel = document.getElementById('edge-from');
+  const toSel = document.getElementById('edge-to');
+  if (!fromSel || !toSel || !fromSel.value || !toSel.value) {
+    btn.textContent = '自動計算: ノード未選択';
+    btn.disabled = true;
+    return;
+  }
+  const fromId = parseInt(fromSel.value);
+  const toId = parseInt(toSel.value);
+  if (fromId === toId) {
+    btn.textContent = '自動計算: 同一ノード';
+    btn.disabled = true;
+    return;
+  }
+  const a = nodes.find(n => n.id === fromId);
+  const b = nodes.find(n => n.id === toId);
+  if (!a || !b) {
+    btn.textContent = '自動計算: ノード未選択';
+    btn.disabled = true;
+    return;
+  }
+  const m = calcDistanceMFromPixels(calcPixelDistance(a, b));
+  btn.textContent = `自動計算: ${m.toFixed(2)} m を反映`;
+  btn.disabled = false;
+  btn.classList.add('ready');
+}
+
+function applyAutoLength() {
+  if (scaleMPerPx == null) return;
+  const fromSel = document.getElementById('edge-from');
+  const toSel = document.getElementById('edge-to');
+  if (!fromSel || !toSel) return;
+  const fromId = parseInt(fromSel.value);
+  const toId = parseInt(toSel.value);
+  if (!fromId || !toId || fromId === toId) return;
+  const a = nodes.find(n => n.id === fromId);
+  const b = nodes.find(n => n.id === toId);
+  if (!a || !b) return;
+  const m = calcDistanceMFromPixels(calcPixelDistance(a, b));
+  document.getElementById('edge-length').value = m.toFixed(2);
+  showToast(`長さを ${m.toFixed(2)} m に反映`);
+}
+
+function saveScaleToStorage() {
+  try {
+    if (scaleMPerPx == null || !scaleCalibration) {
+      localStorage.removeItem('pipingScale');
+      return;
+    }
+    localStorage.setItem('pipingScale', JSON.stringify({
+      mPerPx: scaleMPerPx,
+      calibration: scaleCalibration
+    }));
+  } catch(e) { /* quota or disabled — silently ignore */ }
+}
+
+function loadScaleFromStorage() {
+  try {
+    const raw = localStorage.getItem('pipingScale');
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data && typeof data.mPerPx === 'number' && data.calibration) {
+      scaleMPerPx = data.mPerPx;
+      scaleCalibration = data.calibration;
+      const tb = document.getElementById('scaleToolbar');
+      if (tb) tb.classList.add('set');
+    }
+  } catch(e) { /* corrupt — ignore */ }
+}
+
+function redrawCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.scale(zoomLevel, zoomLevel);
+
+  if (imageLoaded) ctx.drawImage(baseImage, 0, 0);
+
+  // Draw edges
+  const baseEdgeW = Math.max(3, baseImage.width * 0.003);
+  edges.forEach(e => {
+    const nFrom = nodes.find(n => n.id === e.fromNode);
+    const nTo = nodes.find(n => n.id === e.toNode);
+    if (nFrom && nTo) {
+      const isSelected = (e.id === selectedEdgeId);
+      ctx.beginPath();
+      ctx.moveTo(nFrom.x, nFrom.y);
+      ctx.lineTo(nTo.x, nTo.y);
+      ctx.strokeStyle = isSelected ? '#dc2626' : '#2563eb';
+      ctx.lineWidth = isSelected ? baseEdgeW + 2 : baseEdgeW;
+      ctx.stroke();
+      const mx = (nFrom.x + nTo.x) / 2;
+      const my = (nFrom.y + nTo.y) / 2;
+      ctx.font = `${Math.max(12, baseImage.width * 0.012)}px 'Noto Sans JP'`;
+      ctx.fillStyle = isSelected ? '#dc2626' : '#1e293b';
+      ctx.fillText(`${e.diameter} ${e.length}m`, mx + 5, my - 5);
+    }
+  });
+
+  // Draw nodes
+  const r = Math.max(6, baseImage.width * 0.005);
+  const fontSize = Math.max(12, baseImage.width * 0.011);
+  nodes.forEach(n => {
+    const isSelected = (n.id === selectedNodeId);
+    if (isSelected) {
+      // Outer highlight ring for the selected node
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r + 5, 0, Math.PI * 2);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = nodeColorRaw(n.type);
+    ctx.fill();
+    ctx.strokeStyle = isSelected ? '#f59e0b' : '#fff';
+    ctx.lineWidth = isSelected ? 3 : 2;
+    ctx.stroke();
+    if (showNodeLabels) {
+      ctx.font = `bold ${fontSize}px 'Noto Sans JP'`;
+      ctx.fillStyle = '#1e293b';
+      ctx.fillText(n.label, n.x + r + 4, n.y - r);
+    }
+  });
+
+  // Scale calibration overlay (set 後の永続表示 + picking 中の一時表示)
+  drawScaleOverlay();
+
+  ctx.restore();
+}
+
+function drawScaleOverlay() {
+  if (!imageLoaded) return;
+  const lineW = Math.max(2, baseImage.width * 0.002);
+  const dotR = Math.max(4, baseImage.width * 0.004);
+
+  // Picking-in-progress: orange dashed line / dots
+  if (scalePickingMode && scalePickPoints.length > 0) {
+    ctx.save();
+    ctx.strokeStyle = '#f59e0b';
+    ctx.fillStyle = '#f59e0b';
+    ctx.lineWidth = lineW;
+    scalePickPoints.forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, dotR, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    if (scalePickPoints.length === 2) {
+      ctx.setLineDash([6, 4]);
+      ctx.beginPath();
+      ctx.moveTo(scalePickPoints[0].x, scalePickPoints[0].y);
+      ctx.lineTo(scalePickPoints[1].x, scalePickPoints[1].y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.restore();
+    return;
+  }
+
+  // Confirmed calibration: purple dashed baseline
+  if (scaleCalibration) {
+    const p1 = scaleCalibration.p1, p2 = scaleCalibration.p2;
+    ctx.save();
+    ctx.strokeStyle = '#9333ea';
+    ctx.fillStyle = '#9333ea';
+    ctx.lineWidth = lineW;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    [p1, p2].forEach(p => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, dotR, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    const mx = (p1.x + p2.x) / 2;
+    const my = (p1.y + p2.y) / 2;
+    ctx.font = `bold ${Math.max(11, baseImage.width * 0.011)}px 'Noto Sans JP'`;
+    ctx.fillText(`基準 ${scaleCalibration.realM.toFixed(3)}m`, mx + 6, my - 6);
+    ctx.restore();
+  }
+}
+
+function clearCanvas() {
+  baseImage = new Image();
+  imageLoaded = false;
+  canvas.width = 300;
+  canvas.height = 200;
+  ctx.clearRect(0, 0, 300, 200);
+  document.getElementById('canvasInfo').textContent = '図面を読み込んでください';
+}
+
+// ===== NODE MANAGEMENT =====
+// Form submission no longer places immediately. Instead we enter a
+// click-to-place pending mode and the next canvas click decides the position.
+// Fallback: if no image is loaded, fall back to legacy center placement
+// (otherwise there'd be nothing meaningful to click).
+function addNodeFromForm() {
+  const label = document.getElementById('node-label').value.trim();
+  const type = document.getElementById('node-type').value;
+  if (!label) { showToast('ラベルを入力してください'); return; }
+
+  if (!imageLoaded) {
+    // Legacy center-placement fallback when no drawing is loaded.
+    // 画像未ロード時は applyZoom() が即 return するため canvas.width/height は初期値（≈300px）のまま。
+    // 画像座標系の中央を返すよう zoomLevel で逆変換し、範囲外に出ないよう clamp する。
+    const maxX = canvas.width / zoomLevel;
+    const maxY = canvas.height / zoomLevel;
+    let cx = (canvas.width / 2) / zoomLevel;
+    let cy = (canvas.height / 2) / zoomLevel;
+    if (cx < 0 || cx > maxX) cx = maxX / 2;
+    if (cy < 0 || cy > maxY) cy = maxY / 2;
+    placeNodeAt(label, type, cx || 100, cy || 100);
+    return;
+  }
+
+  // If a scale picking is in progress, prefer that — refuse pending here.
+  if (scalePickingMode) { showToast('縮尺設定中です。先に確定または ESC で取消してください'); return; }
+
+  pendingNodePlacement = { label, type };
+  canvasWrap.style.cursor = 'crosshair';
+  updatePendingNodeUi();
+  showToast(`「${label}」を配置: 図面上の位置をクリック（ESCで取消）`);
+}
+
+// Shared placement: pushes a node at given image coords, performs all the
+// usual side-effects, briefly highlights & auto-selects the new node.
+function placeNodeAt(label, type, x, y) {
+  const id = nextNodeId;
+  nodes.push({ id, label, type, x, y });
+  nextNodeId++;
+  document.getElementById('node-label').value = '';
+  renderNodeList();
+  updateNodeSelectors();
+  selectedNodeId = id;
+  selectedEdgeId = null;
+  updateDeleteEdgeBtn();
+  redrawCanvas();
+  saveToStorage();
+  showToast(`ノード「${label}」を追加`);
+  renderUxHints();
+  // Auto-clear the highlight after ~1.8s unless the user has already changed
+  // selection in the meantime.
+  setTimeout(function() {
+    if (selectedNodeId === id) {
+      selectedNodeId = null;
+      redrawCanvas();
+    }
+  }, 1800);
+}
+
+function cancelPendingNodePlacement() {
+  if (!pendingNodePlacement) return;
+  const label = pendingNodePlacement.label;
+  pendingNodePlacement = null;
+  // Restore cursor based on current canvasMode (don't clobber scale picking).
+  if (!scalePickingMode) {
+    if (canvasMode === 'node') canvasWrap.style.cursor = 'crosshair';
+    else if (canvasMode === 'select') canvasWrap.style.cursor = 'default';
+    else canvasWrap.style.cursor = 'grab';
+  }
+  updatePendingNodeUi();
+  showToast(`「${label}」の配置を取消しました`);
+}
+
+function updatePendingNodeUi() {
+  // Update the form button text + disabled state
+  const btn = document.querySelector('button[onclick="addNodeFromForm()"]');
+  if (btn) {
+    if (pendingNodePlacement) {
+      btn.textContent = `配置待機中… ESC で取消`;
+      btn.disabled = true;
+      btn.classList.add('btn-pending');
+    } else {
+      btn.textContent = 'ノードを登録';
+      btn.disabled = false;
+      btn.classList.remove('btn-pending');
+    }
+  }
+  // Update canvas-info banner so the user sees the prompt over the drawing.
+  const info = document.getElementById('canvasInfo');
+  if (info) {
+    if (pendingNodePlacement) {
+      info.textContent = `「${pendingNodePlacement.label}」を配置: 図面上をクリック（ESCで取消）`;
+    } else if (imageLoaded) {
+      info.textContent = `${baseImage.width}×${baseImage.height}px | クリック: ノード追加 / ピンチ: ズーム`;
+    } else {
+      info.textContent = '図面エリア — 画像を読み込んでノードをクリックで配置';
+    }
+  }
+}
+
+function deleteNode(id) {
+  // Remove edges connected to this node
+  edges = edges.filter(e => e.fromNode !== id && e.toNode !== id);
+  nodes = nodes.filter(n => n.id !== id);
+  if (selectedNodeId === id) selectedNodeId = null;
+  if (draggingNode && draggingNode.id === id) draggingNode = null;
+  // If the selected edge was connected to this node, it's gone now.
+  if (selectedEdgeId !== null && !edges.some(e => e.id === selectedEdgeId)) {
+    selectedEdgeId = null;
+    updateDeleteEdgeBtn();
+  }
+  renderNodeList();
+  updateNodeSelectors();
+  renderEdgeList();
+  updateSummary();
+  redrawCanvas();
+  saveToStorage();
+  renderUxHints();
+  maybeRecalcWorkEstimate();
+}
+
+function renderNodeList() {
+  const pane = document.getElementById('nodeListPane');
+  const countEl = document.getElementById('nodeListCount');
+  if (countEl) countEl.textContent = nodes.length;
+  if (nodes.length === 0) {
+    pane.innerHTML = '<div style="padding:12px;font-size:12px;color:var(--text-muted);text-align:center;">ノードなし（図面クリックまたはフォームで追加）</div>';
+    return;
+  }
+  pane.innerHTML = nodes.map(n => `
+    <div class="node-item" data-node-id="${n.id}">
+      <div class="node-dot" style="background:${nodeColorRaw(n.type)}"></div>
+      <span class="node-label editable" onclick="startEditNodeLabel(${n.id})" title="クリックでラベルを編集">${n.label}</span>
+      <span class="node-type">${n.type}</span>
+      <button class="btn btn-sm btn-secondary" onclick="deleteNode(${n.id})" style="padding:2px 6px;font-size:10px;">✕</button>
+    </div>
+  `).join('');
+}
+
+function startEditNodeLabel(id) {
+  const node = nodes.find(n => n.id === id);
+  if (!node) return;
+  const item = document.querySelector(`.node-item[data-node-id="${id}"]`);
+  if (!item) return;
+  const span = item.querySelector('.node-label');
+  if (!span || span.tagName === 'INPUT') return;
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'node-label-input';
+  input.value = node.label;
+  let done = false;
+
+  input.addEventListener('blur', () => {
+    if (done) return;
+    done = true;
+    saveNodeLabel(id, input.value);
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (done) return;
+      done = true;
+      saveNodeLabel(id, input.value);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      if (done) return;
+      done = true;
+      cancelEditNodeLabel(id);
+    }
+  });
+
+  span.replaceWith(input);
+  input.focus();
+  input.select();
+}
+
+function saveNodeLabel(id, newLabel) {
+  const node = nodes.find(n => n.id === id);
+  if (!node) { renderNodeList(); return; }
+  const v = (newLabel || '').trim();
+  if (!v || v === node.label) {
+    renderNodeList();
+    return;
+  }
+  node.label = v;
+  renderNodeList();
+  updateNodeSelectors();
+  redrawCanvas();
+  saveToStorage();
+  renderUxHints();
+  showToast(`ラベルを「${v}」に変更`);
+}
+
+function cancelEditNodeLabel(id) {
+  renderNodeList();
+}
+
+function nodeColorRaw(type) {
+  switch(type) {
+    case 'メーター': return '#16a34a';
+    case '機器接続': return '#dc2626';
+    case '末端': return '#6b7280';
+    case 'バルブ設置点': return '#d97706';
+    case '継手': return '#9333ea';
+    default: return '#2563eb';
+  }
+}
+
+function updateNodeSelectors() {
+  const opts = nodes.map(n => `<option value="${n.id}">${n.label} (${n.type})</option>`).join('');
+  document.getElementById('edge-from').innerHTML = opts;
+  document.getElementById('edge-to').innerHTML = opts;
+  const viaSel = document.getElementById('via-node-sel');
+  if (viaSel) viaSel.innerHTML = '<option value="">-- 追加 --</option>' + opts;
+  // Auto-select last two nodes
+  if (nodes.length >= 2) {
+    document.getElementById('edge-from').value = nodes[nodes.length - 2].id;
+    document.getElementById('edge-to').value = nodes[nodes.length - 1].id;
+  }
+  hideHandoffBadge();
+  updateAutoLenBtn();
+  renderViaNodeTags();
+}
+
+// ===== VALVE TAGS =====
+function addValveTag() {
+  const sel = document.getElementById('valve-type-sel');
+  const val = sel.value;
+  if (!val) return;
+  currentValves.push(val);
+  sel.value = '';
+  renderValveTags();
+}
+
+function removeValveTag(idx) {
+  currentValves.splice(idx, 1);
+  renderValveTags();
+}
+
+function renderValveTags() {
+  const container = document.getElementById('valveTags');
+  container.innerHTML = currentValves.map((v, i) =>
+    `<span class="valve-tag">${v} <span class="remove" onclick="removeValveTag(${i})">✕</span></span>`
+  ).join('');
+}
+
+// ===== VIA NODE TAGS =====
+function addViaNodeTag() {
+  const sel = document.getElementById('via-node-sel');
+  const raw = sel.value;
+  if (!raw) return;
+  const nodeId = parseInt(raw);
+  if (isNaN(nodeId)) return;
+  const fromId = parseInt(document.getElementById('edge-from').value);
+  const toId = parseInt(document.getElementById('edge-to').value);
+  if (nodeId === fromId || nodeId === toId) {
+    showToast('始点・終点と同じノードは経由に追加できません');
+    return;
+  }
+  if (currentViaNodeIds.includes(nodeId)) {
+    showToast('同じ経由ノードは追加できません');
+    return;
+  }
+  currentViaNodeIds.push(nodeId);
+  sel.value = '';
+  renderViaNodeTags();
+}
+
+function removeViaNodeTag(idx) {
+  currentViaNodeIds.splice(idx, 1);
+  renderViaNodeTags();
+}
+
+function moveViaNodeTag(idx, delta) {
+  const newIdx = idx + delta;
+  if (newIdx < 0 || newIdx >= currentViaNodeIds.length) return;
+  const tmp = currentViaNodeIds[idx];
+  currentViaNodeIds[idx] = currentViaNodeIds[newIdx];
+  currentViaNodeIds[newIdx] = tmp;
+  renderViaNodeTags();
+}
+
+function renderViaNodeTags() {
+  const container = document.getElementById('viaNodeTags');
+  if (container) {
+    container.innerHTML = currentViaNodeIds.map((id, i) => {
+      const n = nodes.find(x => x.id === id);
+      const label = n ? n.label : '?';
+      return `<span class="via-node-tag">`
+        + `<span class="move" onclick="moveViaNodeTag(${i},-1)">↑</span>`
+        + `<span class="move" onclick="moveViaNodeTag(${i},1)">↓</span>`
+        + `${label}`
+        + `<span class="remove" onclick="removeViaNodeTag(${i})">✕</span>`
+        + `</span>`;
+    }).join('');
+  }
+  const preview = document.getElementById('viaPreview');
+  if (preview) {
+    const fromId = parseInt(document.getElementById('edge-from').value);
+    const toId = parseInt(document.getElementById('edge-to').value);
+    const fromN = nodes.find(n => n.id === fromId);
+    const toN = nodes.find(n => n.id === toId);
+    if (!fromN && !toN && currentViaNodeIds.length === 0) {
+      preview.textContent = '';
+      return;
+    }
+    const viaLabels = currentViaNodeIds.map(id => {
+      const n = nodes.find(x => x.id === id);
+      return n ? n.label : '?';
+    });
+    const parts = [fromN ? fromN.label : '始点?', ...viaLabels, toN ? toN.label : '終点?'];
+    preview.textContent = '経路: ' + parts.join(' → ');
+  }
+}
+
+// ===== EDGE MANAGEMENT =====
+function addEdge() {
+  const fromId = parseInt(document.getElementById('edge-from').value);
+  const toId = parseInt(document.getElementById('edge-to').value);
+  const length = parseFloat(document.getElementById('edge-length').value);
+
+  if (!fromId || !toId) { showToast('始点・終点ノードを選択してください'); return; }
+  if (fromId === toId) { showToast('始点と終点が同じです'); return; }
+  if (isNaN(length) || length <= 0) { showToast('長さを入力してください'); return; }
+
+  const edge = {
+    id: nextEdgeId,
+    fromNode: fromId,
+    toNode: toId,
+    system: document.getElementById('edge-system').value,
+    material: document.getElementById('edge-material').value,
+    diameter: document.getElementById('edge-diameter').value,
+    length: length,
+    direction: document.getElementById('edge-direction').value,
+    location: document.getElementById('edge-location').value,
+    memo: document.getElementById('edge-memo').value,
+    valves: [...currentValves],
+    via_node_ids: [...currentViaNodeIds]
+  };
+
+  edges.push(edge);
+  edgeHistory.push(edge.id);
+  nextEdgeId++;
+
+  // Clear non-persistent fields
+  document.getElementById('edge-length').value = '';
+  document.getElementById('edge-memo').value = '';
+  currentValves = [];
+  renderValveTags();
+  currentViaNodeIds = [];
+  renderViaNodeTags();
+
+  // Auto-advance: set from to previous to
+  document.getElementById('edge-from').value = toId;
+  showHandoffBadge();
+
+  renderEdgeList();
+  updateSummary();
+  redrawCanvas();
+  saveToStorage();
+  showToast(`区間 E${edge.id} を追加`);
+  renderUxHints();
+  maybeRecalcWorkEstimate();
+}
+
+function deleteEdge(id) {
+  edges = edges.filter(e => e.id !== id);
+  if (selectedEdgeId === id) { selectedEdgeId = null; updateDeleteEdgeBtn(); }
+  renderEdgeList();
+  updateSummary();
+  redrawCanvas();
+  saveToStorage();
+  renderUxHints();
+  maybeRecalcWorkEstimate();
+}
+
+function undoLastEdge() {
+  if (edgeHistory.length === 0) { showToast('元に戻す操作がありません'); return; }
+  const lastId = edgeHistory.pop();
+  edges = edges.filter(e => e.id !== lastId);
+  if (selectedEdgeId === lastId) { selectedEdgeId = null; updateDeleteEdgeBtn(); }
+  renderEdgeList();
+  updateSummary();
+  redrawCanvas();
+  saveToStorage();
+  showToast('直前の区間を取り消しました');
+  hideHandoffBadge();
+  renderUxHints();
+  maybeRecalcWorkEstimate();
+}
+
+function renderEdgeList() {
+  const container = document.getElementById('edgeListContainer');
+  if (edges.length === 0) {
+    container.innerHTML = '<div class="empty-state"><div class="icon">📋</div>まだ区間がありません<span class="hint">「入力」タブで始点・終点・長さを入力し『区間を確定 →』を押すと、ここに一覧されます</span></div>';
+    return;
+  }
+  container.innerHTML = edges.map(e => {
+    const fromN = nodes.find(n => n.id === e.fromNode);
+    const toN = nodes.find(n => n.id === e.toNode);
+    const fromLabel = fromN ? fromN.label : '?';
+    const toLabel = toN ? toN.label : '?';
+    const viaLabels = (e.via_node_ids || []).map(id => {
+      const n = nodes.find(x => x.id === id);
+      return n ? n.label : '?';
+    });
+    const route = [fromLabel, ...viaLabels, toLabel].join(' → ');
+    const valveStr = e.valves.length ? ` | バルブ: ${e.valves.join(', ')}` : '';
+    return `
+      <div class="edge-row">
+        <span class="edge-id">E${e.id}</span>
+        <div class="edge-detail">
+          <div class="edge-route">${route}</div>
+          <div class="edge-attrs">${e.material} ${e.diameter} / ${e.length}m / ${e.direction} / ${e.location}${valveStr}${e.memo ? ' | '+e.memo : ''}</div>
+        </div>
+        <button class="btn btn-sm btn-secondary" onclick="deleteEdge(${e.id})" style="padding:3px 8px;">削除</button>
+      </div>`;
+  }).join('');
+}
+
+// ===== SUMMARY =====
+function updateSummary() {
+  updatePipeTable();
+  updateFittingTable();
+  updateValveTable();
+  updateEquipmentTable();
+}
+
+function updatePipeTable() {
+  const tbody = document.querySelector('#tbl-pipe tbody');
+  const lossFactor = parseFloat(document.getElementById('loss-factor').value) || 1.05;
+  const stdLen = parseFloat(document.getElementById('standard-length').value) || 4;
+
+  const summary = {};
+  edges.forEach(e => {
+    const key = [e.system, e.material, e.diameter, e.location].join('|');
+    summary[key] = (summary[key] || 0) + e.length;
+  });
+
+  let html = '';
+  for (const key in summary) {
+    const [sys, mat, dia, loc] = key.split('|');
+    const totalLen = summary[key];
+    const rawCount = Math.ceil(totalLen / stdLen);
+    const reqCount = Math.ceil(rawCount * lossFactor);
+    html += `<tr><td>${sys}</td><td>${mat}</td><td>${dia}</td><td>${loc}</td><td>${totalLen.toFixed(1)}</td><td>${rawCount}</td><td>${reqCount}</td></tr>`;
+  }
+  tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:16px 10px;">区間を追加すると、ここに系統・管種・口径・施工場所ごとの合計 (m) と定尺本数・所要数量が出ます</td></tr>';
+}
+
+function updateFittingTable() {
+  const tbody = document.querySelector('#tbl-fitting tbody');
+  const fittings = {};
+
+  nodes.forEach(node => {
+    const connected = edges.filter(e => e.fromNode === node.id || e.toNode === node.id);
+    if (connected.length < 2) return;
+
+    const firstEdge = connected[0];
+    const sys = firstEdge.system;
+    const mat = firstEdge.material;
+    const dia = firstEdge.diameter;
+
+    // Elbow: 2 edges with different direction
+    if (connected.length === 2) {
+      if (connected[0].direction !== connected[1].direction) {
+        const k = [sys, mat, dia, 'エルボ'].join('|');
+        fittings[k] = (fittings[k] || 0) + 1;
+      }
+      // Reducer: different diameters
+      const diameters = [...new Set(connected.map(e => e.diameter))];
+      if (diameters.length > 1) {
+        const maxDia = diameters.sort((a, b) => parseInt(b) - parseInt(a))[0];
+        const k = [sys, mat, maxDia, '異径ソケット'].join('|');
+        fittings[k] = (fittings[k] || 0) + 1;
+      }
+    }
+
+    // Tee: 3 edges
+    if (connected.length === 3) {
+      const k = [sys, mat, dia, 'チーズ'].join('|');
+      fittings[k] = (fittings[k] || 0) + 1;
+    }
+
+    // Cross or complex: 4+ edges
+    if (connected.length >= 4) {
+      const k = [sys, mat, dia, 'チーズ（要確認）'].join('|');
+      fittings[k] = (fittings[k] || 0) + 1;
+    }
+  });
+
+  let html = '';
+  for (const key in fittings) {
+    const [sys, mat, dia, fType] = key.split('|');
+    html += `<tr><td>${sys}</td><td>${mat}</td><td>${dia}</td><td>${fType}</td><td>${fittings[key]}</td></tr>`;
+  }
+  tbody.innerHTML = html || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px 10px;">区間を追加すると、ノードの接続状況から継手数（エルボ・異径・チーズ）を自動推定します</td></tr>';
+}
+
+function updateValveTable() {
+  const tbody = document.querySelector('#tbl-valve tbody');
+  const summary = {};
+  edges.forEach(e => {
+    e.valves.forEach(v => {
+      const k = [e.system, v, e.diameter].join('|');
+      summary[k] = (summary[k] || 0) + 1;
+    });
+  });
+
+  let html = '';
+  for (const key in summary) {
+    const [sys, vt, dia] = key.split('|');
+    html += `<tr><td>${sys}</td><td>${vt}</td><td>${dia}</td><td>${summary[key]}</td></tr>`;
+  }
+  tbody.innerHTML = html || '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:16px 10px;">区間登録時にバルブを追加すると、種類・系統・口径ごとに集計されます</td></tr>';
+}
+
+function updateEquipmentTable() {
+  const tbody = document.querySelector('#tbl-equip tbody');
+  const equipNodes = nodes.filter(n => n.type === '機器接続');
+
+  let html = '';
+  equipNodes.forEach(n => {
+    const connected = edges.find(e => e.fromNode === n.id || e.toNode === n.id);
+    html += `<tr>
+      <td>N${n.id}</td>
+      <td>${n.label}</td>
+      <td>${connected ? connected.material : '-'}</td>
+      <td>${connected ? connected.diameter : '-'}</td>
+      <td>${connected ? connected.system : '-'}</td>
+    </tr>`;
+  });
+  tbody.innerHTML = html || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px 10px;">種類が「機器接続」のノードが登録されると、ここに一覧されます</td></tr>';
+}
+
+// ===== EXPORT =====
+function exportJSON() {
+  const data = {
+    version: 'v4',
+    timestamp: new Date().toISOString(),
+    nodes,
+    edges
+  };
+  downloadFile('piping_network.json', JSON.stringify(data, null, 2), 'application/json');
+  showToast('JSON出力完了');
+}
+
+function exportCSV(type) {
+  let csv = '';
+  const BOM = '\uFEFF'; // for Excel JP
+
+  if (type === 'pipe' || type === 'all') {
+    csv += '=== 直管集計 ===\n';
+    csv += '系統,管種,口径,施工場所,合計(m),定尺本数,所要数量\n';
+    const lossFactor = parseFloat(document.getElementById('loss-factor').value) || 1.05;
+    const stdLen = parseFloat(document.getElementById('standard-length').value) || 4;
+    const summary = {};
+    edges.forEach(e => {
+      const key = [e.system, e.material, e.diameter, e.location].join(',');
+      summary[key] = (summary[key] || 0) + e.length;
+    });
+    for (const key in summary) {
+      const totalLen = summary[key];
+      const rawCount = Math.ceil(totalLen / stdLen);
+      const reqCount = Math.ceil(rawCount * lossFactor);
+      csv += `${key},${totalLen.toFixed(1)},${rawCount},${reqCount}\n`;
+    }
+    csv += '\n';
+  }
+
+  if (type === 'fitting' || type === 'all') {
+    csv += '=== 継手集計 ===\n';
+    csv += '系統,管種,口径,種類,数量\n';
+    // Recompute fittings
+    const fittings = computeFittings();
+    for (const key in fittings) {
+      csv += `${key.replace(/\|/g, ',')},${fittings[key]}\n`;
+    }
+    csv += '\n';
+  }
+
+  if (type === 'valve' || type === 'all') {
+    csv += '=== バルブ類 ===\n';
+    csv += '系統,種類,口径,数量\n';
+    const vs = {};
+    edges.forEach(e => {
+      e.valves.forEach(v => {
+        const k = [e.system, v, e.diameter].join(',');
+        vs[k] = (vs[k] || 0) + 1;
+      });
+    });
+    for (const key in vs) csv += `${key},${vs[key]}\n`;
+    csv += '\n';
+  }
+
+  if (type === 'edges') {
+    csv += 'EdgeID,始点,終点,系統,管種,口径,長さ(m),方向,施工場所,バルブ,メモ\n';
+    edges.forEach(e => {
+      const fromN = nodes.find(n => n.id === e.fromNode);
+      const toN = nodes.find(n => n.id === e.toNode);
+      csv += `E${e.id},${fromN?fromN.label:'?'},${toN?toN.label:'?'},${e.system},${e.material},${e.diameter},${e.length},${e.direction},${e.location},"${e.valves.join('/')}","${e.memo}"\n`;
+    });
+  }
+
+  if (type === 'bukake') {
+    csv += '工種カテゴリ,工種詳細,系統,管種,口径,方向,施工場所,単位,数量,KEY\n';
+    buildBukakeRows().forEach(r => {
+      csv += [
+        r.category, r.categoryDetail, r.system, r.material, r.diameter,
+        r.direction, r.location, r.unit, r.qty, makeBukakeKey(r)
+      ].map(csvFieldBukake).join(',') + '\n';
+    });
+  }
+
+  const filename = type === 'all' ? 'piping_summary_all.csv' :
+                   type === 'edges' ? 'piping_edges.csv' :
+                   `piping_${type}.csv`;
+  downloadFile(filename, BOM + csv, 'text/csv');
+  showToast(`${filename} 出力完了`);
+}
+
+// ===== BUKAKE CSV (Excel 歩掛連携用) =====
+// 既存 CSV / 既存集計関数 / computeFittings には一切依存しない独立実装。
+// 行順は保証しない（仕様）。Excel 側は KEY 列で SUMIFS / XLOOKUP する想定。
+
+function pipeDetailByDirection(dir) {
+  if (dir === '横引き') return '横引き直管';
+  if (dir === '立上り') return '立上り直管';
+  if (dir === '立下り') return '立下り直管';
+  return (dir || '-') + '直管';
+}
+
+// Build a match key for the Excel 歩掛 master.
+//
+// IMPORTANT: 列互換あり / 照合キー互換なし
+//   - CSV のヘッダ・列順・列数は旧 bukake と同一（列互換あり）
+//   - ただし KEY 列の中身は工種別プレフィックス付きの新形式
+//     (pipe / fit / valve / equip) に変わる（照合キー互換なし）
+//   - 既存 Excel ブックの旧 KEY 直値 (`工種詳細|系統|管種|口径|方向|施工場所`)
+//     では XLOOKUP / SUMIFS に一致しないため、マスター側の KEY を
+//     新形式へ移行する必要がある。
+function makeBukakeKey(row) {
+  const norm = v => {
+    if (v == null || v === '') return '-';
+    // Normalize: pipe collision, CRLF / tab / 連続空白 / 全角空白 → 半角空白 1 個
+    const s = String(v)
+      .replace(/\|/g, '／')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return s === '' ? '-' : s;
+  };
+  const code = row.categoryCode;
+
+  // Pipe: 管種・口径・方向・施工場所の 4 軸（系統は KEY に含めない）
+  if (code === 'pipe') {
+    return ['pipe',
+            norm(row.material),
+            norm(row.diameter),
+            norm(row.direction),
+            norm(row.location)].join('|');
+  }
+  // Fit / Valve: 工種詳細・口径・施工場所の 3 軸
+  if (code === 'fit' || code === 'valve') {
+    return [code,
+            norm(row.categoryDetail),
+            norm(row.diameter),
+            norm(row.location)].join('|');
+  }
+  // Equip: 機器接続は当面固定文字列。自由入力 label をマスター照合には使わない。
+  // （工種詳細列には `${label}接続` が残るので人間は追跡できる）
+  if (code === 'equip') {
+    return ['equip',
+            '機器接続',
+            norm(row.diameter),
+            norm(row.location)].join('|');
+  }
+  // Unknown: 目立たせる prefix + 全軸 + console.warn。
+  // 将来カテゴリを追加したとき、makeBukakeKey の更新漏れを早期発見するためのセーフティネット。
+  console.warn('[makeBukakeKey] unknown categoryCode:', code, row);
+  return ['unknown',
+          norm(row.categoryDetail),
+          norm(row.system),
+          norm(row.material),
+          norm(row.diameter),
+          norm(row.direction),
+          norm(row.location)].join('|');
+}
+
+function csvFieldBukake(v) {
+  const s = (v == null) ? '' : String(v);
+  if (/[",\n\r]/.test(s)) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function buildBukakeRows() {
+  const rows = [];
+  const SEP = '\u0001'; // 内部キー区切り（フィールド衝突回避）
+
+  // ===== ① 直管: edges を [system, material, diameter, direction, location] で再集計 =====
+  const pipeAgg = {};
+  edges.forEach(e => {
+    const k = [e.system, e.material, e.diameter, e.direction, e.location].join(SEP);
+    pipeAgg[k] = (pipeAgg[k] || 0) + e.length;
+  });
+  for (const k in pipeAgg) {
+    const [system, material, diameter, direction, location] = k.split(SEP);
+    rows.push({
+      category: '直管',
+      categoryCode: 'pipe',
+      categoryDetail: pipeDetailByDirection(direction),
+      system: system,
+      material: material,
+      diameter: diameter,
+      direction: direction,
+      location: location,
+      unit: 'm',
+      qty: pipeAgg[k].toFixed(1)
+    });
+  }
+
+  // ===== ② 継手: computeFittings を使わず独立実装 =====
+  nodes.forEach(node => {
+    const connected = edges.filter(e => e.fromNode === node.id || e.toNode === node.id);
+    if (connected.length < 2) return;
+    const firstEdge = connected[0];
+    const sys = firstEdge.system;
+    const mat = firstEdge.material;
+    const dia = firstEdge.diameter;
+    const loc = firstEdge.location;
+
+    const pushFitting = (fType, d) => {
+      rows.push({
+        category: '継手',
+        categoryCode: 'fit',
+        categoryDetail: fType,
+        system: sys,
+        material: mat,
+        diameter: d,
+        direction: '-',
+        location: loc,
+        unit: '個',
+        qty: 1
+      });
+    };
+
+    if (connected.length === 2) {
+      if (connected[0].direction !== connected[1].direction) {
+        pushFitting('エルボ', dia);
+      }
+      const diameters = [...new Set(connected.map(e => e.diameter))];
+      if (diameters.length > 1) {
+        const maxDia = diameters.sort((a, b) => parseInt(b) - parseInt(a))[0];
+        pushFitting('異径ソケット', maxDia);
+      }
+    }
+    if (connected.length === 3) pushFitting('チーズ', dia);
+    if (connected.length >= 4) pushFitting('チーズ（要確認）', dia);
+  });
+
+  // ===== ③ バルブ: edges を [system, valve, diameter, location] で再集計、管種は "-" 固定 =====
+  const valveAgg = {};
+  edges.forEach(e => {
+    e.valves.forEach(v => {
+      const k = [e.system, v, e.diameter, e.location].join(SEP);
+      valveAgg[k] = (valveAgg[k] || 0) + 1;
+    });
+  });
+  for (const k in valveAgg) {
+    const [system, valve, diameter, location] = k.split(SEP);
+    rows.push({
+      category: 'バルブ',
+      categoryCode: 'valve',
+      categoryDetail: valve,
+      system: system,
+      material: '-',
+      diameter: diameter,
+      direction: '-',
+      location: location,
+      unit: '個',
+      qty: valveAgg[k]
+    });
+  }
+
+  // ===== ④ 機器接続: type === '機器接続' のノード × 1 行 =====
+  nodes.filter(n => n.type === '機器接続').forEach(n => {
+    const connected = edges.find(e => e.fromNode === n.id || e.toNode === n.id);
+    const label = (n.label || '').trim();
+    const detail = label ? (label + '接続') : '機器接続';
+    if (connected) {
+      rows.push({
+        category: '機器接続',
+        categoryCode: 'equip',
+        categoryDetail: detail,
+        system: connected.system,
+        material: connected.material,
+        diameter: connected.diameter,
+        direction: '-',
+        location: connected.location,
+        unit: '箇所',
+        qty: 1
+      });
+    } else {
+      rows.push({
+        category: '機器接続',
+        categoryCode: 'equip',
+        categoryDetail: detail,
+        system: '-',
+        material: '-',
+        diameter: '-',
+        direction: '-',
+        location: '-',
+        unit: '箇所',
+        qty: 1
+      });
+    }
+  });
+
+  return rows;
+}
+
+function computeFittings() {
+  const fittings = {};
+  nodes.forEach(node => {
+    const connected = edges.filter(e => e.fromNode === node.id || e.toNode === node.id);
+    if (connected.length < 2) return;
+    const fe = connected[0];
+    const sys = fe.system, mat = fe.material, dia = fe.diameter;
+    if (connected.length === 2) {
+      if (connected[0].direction !== connected[1].direction) {
+        const k = [sys, mat, dia, 'エルボ'].join('|');
+        fittings[k] = (fittings[k] || 0) + 1;
+      }
+      const diameters = [...new Set(connected.map(e => e.diameter))];
+      if (diameters.length > 1) {
+        const maxDia = diameters.sort((a, b) => parseInt(b) - parseInt(a))[0];
+        const k = [sys, mat, maxDia, '異径ソケット'].join('|');
+        fittings[k] = (fittings[k] || 0) + 1;
+      }
+    }
+    if (connected.length === 3) {
+      const k = [sys, mat, dia, 'チーズ'].join('|');
+      fittings[k] = (fittings[k] || 0) + 1;
+    }
+    if (connected.length >= 4) {
+      const k = [sys, mat, dia, 'チーズ（要確認）'].join('|');
+      fittings[k] = (fittings[k] || 0) + 1;
+    }
+  });
+  return fittings;
+}
+
+function downloadFile(name, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== WORK ESTIMATE (v4) =====
+const WORK_ESTIMATE_STORAGE_KEY = 'pipingWorkEstimate';
+const WORK_ESTIMATE_DEFAULTS = {
+  materialFactorTable: {
+    pvc:   { factor: 1.0,  baseMin: 15, unitPrice: 3000 },
+    ef:    { factor: 1.25, baseMin: 15, unitPrice: 3000 },
+    steel: { factor: 1.75, baseMin: 15, unitPrice: 3000 },
+    other: { factor: 1.0,  baseMin: 15, unitPrice: 3000 }
+  },
+  auxWorkTable: {
+    anchor:  { qty: 0, baseMin: 15, unitPrice: 3000 },
+    support: { additionalQty: 0, baseMin: 15, unitPrice: 3000 }
+  }
+};
+const WORK_ESTIMATE_CATEGORY_LABELS = {
+  pvc: '塩ビ管（糊付）',
+  ef: '電気融着専用パイプ',
+  steel: '鉄管（ねじ切り・接合）',
+  other: 'その他'
+};
+let workEstimate = JSON.parse(JSON.stringify(WORK_ESTIMATE_DEFAULTS));
+
+function classifyMaterial(name) {
+  if (!name) return 'other';
+  const s = String(name);
+  if (/EF|電気融着/i.test(s)) return 'ef';
+  const pvcList = ['VP', 'HIVP', 'PLV-VA', 'PLV-VB', 'PLV-VD', 'PE管', '耐火二層管'];
+  if (pvcList.some(k => s.indexOf(k) !== -1)) return 'pvc';
+  const steelList = ['SGP（白）', 'SGP（黒）', 'SUS', '被覆鋼管', 'フレキ管', 'MF（メタルフレキ）', '銅管'];
+  if (steelList.some(k => s.indexOf(k) !== -1)) return 'steel';
+  return 'other';
+}
+
+function csvEscape(value) {
+  const s = (value === null || value === undefined) ? '' : String(value);
+  if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1 || s.indexOf('\r') !== -1) {
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  return s;
+}
+
+function loadWorkEstimate() {
+  try {
+    const raw = localStorage.getItem(WORK_ESTIMATE_STORAGE_KEY);
+    if (!raw) { workEstimate = JSON.parse(JSON.stringify(WORK_ESTIMATE_DEFAULTS)); return; }
+    const parsed = JSON.parse(raw);
+    workEstimate = JSON.parse(JSON.stringify(WORK_ESTIMATE_DEFAULTS));
+    if (parsed.materialFactorTable) {
+      Object.keys(workEstimate.materialFactorTable).forEach(k => {
+        if (parsed.materialFactorTable[k]) {
+          Object.assign(workEstimate.materialFactorTable[k], parsed.materialFactorTable[k]);
+        }
+      });
+    }
+    if (parsed.auxWorkTable) {
+      Object.keys(workEstimate.auxWorkTable).forEach(k => {
+        if (parsed.auxWorkTable[k]) {
+          Object.assign(workEstimate.auxWorkTable[k], parsed.auxWorkTable[k]);
+        }
+      });
+    }
+  } catch (e) {
+    workEstimate = JSON.parse(JSON.stringify(WORK_ESTIMATE_DEFAULTS));
+  }
+}
+
+function saveWorkEstimate() {
+  try {
+    localStorage.setItem(WORK_ESTIMATE_STORAGE_KEY, JSON.stringify(workEstimate));
+  } catch (e) { /* quota exceeded - silently fail */ }
+}
+
+function renderWorkEstimateMasters() {
+  const mTable = document.getElementById('weMaterialTable');
+  if (!mTable) return;
+  mTable.querySelectorAll('input[data-field]').forEach(inp => {
+    const key = inp.dataset.key;
+    const field = inp.dataset.field;
+    const row = workEstimate.materialFactorTable[key];
+    if (row && row[field] !== undefined) inp.value = row[field];
+  });
+  const aTable = document.getElementById('weAuxTable');
+  if (!aTable) return;
+  aTable.querySelectorAll('input[data-field]').forEach(inp => {
+    const key = inp.dataset.key;
+    const field = inp.dataset.field;
+    const row = workEstimate.auxWorkTable[key];
+    if (row && row[field] !== undefined) inp.value = row[field];
+  });
+}
+
+function readWorkEstimateInputs() {
+  const mTable = document.getElementById('weMaterialTable');
+  if (mTable) {
+    mTable.querySelectorAll('input[data-field]').forEach(inp => {
+      const key = inp.dataset.key;
+      const field = inp.dataset.field;
+      const row = workEstimate.materialFactorTable[key];
+      if (!row) return;
+      const v = parseFloat(inp.value);
+      if (!isNaN(v) && v >= 0) row[field] = v;
+    });
+  }
+  const aTable = document.getElementById('weAuxTable');
+  if (aTable) {
+    aTable.querySelectorAll('input[data-field]').forEach(inp => {
+      const key = inp.dataset.key;
+      const field = inp.dataset.field;
+      const row = workEstimate.auxWorkTable[key];
+      if (!row) return;
+      const v = parseFloat(inp.value);
+      if (!isNaN(v) && v >= 0) row[field] = v;
+    });
+  }
+}
+
+function computeWorkEstimateRows() {
+  const buckets = { pvc: 0, ef: 0, steel: 0, other: 0 };
+  let totalLen = 0;
+  edges.forEach(e => {
+    const len = parseFloat(e.length) || 0;
+    if (len <= 0) return;
+    const cat = classifyMaterial(e.material);
+    buckets[cat] += len;
+    totalLen += len;
+  });
+  const rows = [];
+  ['pvc', 'ef', 'steel', 'other'].forEach(cat => {
+    const length = buckets[cat];
+    if (length <= 0) return;
+    const m = workEstimate.materialFactorTable[cat];
+    const minutes = length * m.factor * m.baseMin;
+    const cost = minutes / 15 * m.unitPrice;
+    rows.push({
+      group: '配管設置',
+      label: WORK_ESTIMATE_CATEGORY_LABELS[cat],
+      qty: length,
+      qtyDisplay: length.toFixed(2),
+      unit: 'm',
+      factor: m.factor,
+      minutes,
+      manDay: minutes / 480,
+      cost
+    });
+  });
+  const auxAnchor = workEstimate.auxWorkTable.anchor;
+  if (auxAnchor.qty > 0) {
+    const minutes = auxAnchor.qty * auxAnchor.baseMin;
+    rows.push({
+      group: '付帯作業',
+      label: '天井アンカー設置',
+      qty: auxAnchor.qty,
+      qtyDisplay: String(auxAnchor.qty),
+      unit: '箇所',
+      factor: 1,
+      minutes,
+      manDay: minutes / 480,
+      cost: minutes / 15 * auxAnchor.unitPrice
+    });
+  }
+  const auxSupport = workEstimate.auxWorkTable.support;
+  const supportAuto = Math.ceil(totalLen);
+  const supportQty = supportAuto + (auxSupport.additionalQty || 0);
+  if (supportQty > 0) {
+    const minutes = supportQty * auxSupport.baseMin;
+    rows.push({
+      group: '付帯作業',
+      label: '支持台固定（自動 ' + supportAuto + ' + 追加 ' + (auxSupport.additionalQty || 0) + '）',
+      qty: supportQty,
+      qtyDisplay: String(supportQty),
+      unit: '台',
+      factor: 1,
+      minutes,
+      manDay: minutes / 480,
+      cost: minutes / 15 * auxSupport.unitPrice
+    });
+  }
+  return { rows, totalLen, supportAuto };
+}
+
+function recalcWorkEstimate() {
+  const body = document.getElementById('wePreviewBody');
+  if (!body) return;
+  readWorkEstimateInputs();
+  const { rows, supportAuto } = computeWorkEstimateRows();
+  const auto = document.getElementById('weSupportAuto');
+  if (auto) auto.textContent = '（自動: ' + supportAuto + ' 台）';
+  body.innerHTML = '';
+  let totalMinutes = 0, totalManDay = 0, totalCost = 0;
+  rows.forEach(r => {
+    totalMinutes += r.minutes;
+    totalManDay += r.manDay;
+    totalCost += r.cost;
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      '<td>' + r.group + '</td>' +
+      '<td>' + r.label + '</td>' +
+      '<td class="num-cell">' + r.qtyDisplay + '</td>' +
+      '<td>' + r.unit + '</td>' +
+      '<td class="num-cell">' + r.factor + '</td>' +
+      '<td class="num-cell">' + r.minutes.toFixed(1) + '</td>' +
+      '<td class="num-cell">' + r.manDay.toFixed(2) + '</td>' +
+      '<td class="num-cell">' + Math.round(r.cost).toLocaleString() + '</td>';
+    body.appendChild(tr);
+  });
+  if (rows.length === 0) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td colspan="8" style="text-align:center;color:var(--text-muted);padding:14px;">区間データまたは付帯作業の入力がありません</td>';
+    body.appendChild(tr);
+  } else {
+    const tr = document.createElement('tr');
+    tr.className = 'we-total-row';
+    tr.innerHTML =
+      '<td colspan="5">合計</td>' +
+      '<td class="num-cell">' + totalMinutes.toFixed(1) + '</td>' +
+      '<td class="num-cell">' + totalManDay.toFixed(2) + '</td>' +
+      '<td class="num-cell">' + Math.round(totalCost).toLocaleString() + '</td>';
+    body.appendChild(tr);
+  }
+}
+
+function onWorkEstimateInputChange() {
+  readWorkEstimateInputs();
+  saveWorkEstimate();
+  recalcWorkEstimate();
+}
+
+function maybeRecalcWorkEstimate() {
+  const panel = document.getElementById('tab-work');
+  if (panel && panel.classList.contains('active')) recalcWorkEstimate();
+}
+
+function exportWorkEstimateCSV() {
+  readWorkEstimateInputs();
+  const { rows } = computeWorkEstimateRows();
+  const BOM = '﻿'; // for Excel JP
+  const header = ['作業区分', '管種or内容', '数量', '単位', '係数', '工数(分)', '人工', '金額(円)'];
+  const lines = [header.map(csvEscape).join(',')];
+  let totalMinutes = 0, totalManDay = 0, totalCost = 0;
+  rows.forEach(r => {
+    totalMinutes += r.minutes;
+    totalManDay += r.manDay;
+    totalCost += r.cost;
+    lines.push([
+      r.group, r.label, r.qtyDisplay, r.unit, r.factor,
+      r.minutes.toFixed(1), r.manDay.toFixed(2), Math.round(r.cost)
+    ].map(csvEscape).join(','));
+  });
+  lines.push(['合計', '', '', '', '', totalMinutes.toFixed(1), totalManDay.toFixed(2), Math.round(totalCost)].map(csvEscape).join(','));
+  downloadFile('work_estimate.csv', BOM + lines.join('\r\n'), 'text/csv');
+}
+
+// ===== STORAGE =====
+function saveToStorage() {
+  try {
+    const data = { nodes, edges, nextNodeId, nextEdgeId };
+    localStorage.setItem('pipingToolData', JSON.stringify(data));
+  } catch(e) { /* quota exceeded - silently fail */ }
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem('pipingToolData');
+    if (!raw) { renderUxHints(); return; }
+    const data = JSON.parse(raw);
+    nodes = data.nodes || [];
+    edges = data.edges || [];
+    nextNodeId = data.nextNodeId || 1;
+    nextEdgeId = data.nextEdgeId || 1;
+    renderNodeList();
+    updateNodeSelectors();
+    renderEdgeList();
+    updateSummary();
+    redrawCanvas();
+    renderUxHints();
+  } catch(e) { renderUxHints(); /* corrupt data - start fresh */ }
+}
+
+function clearAllData() {
+  if (!confirm('全てのノード・区間データを削除します。よろしいですか？')) return;
+  nodes = [];
+  edges = [];
+  edgeHistory = [];
+  nextNodeId = 1;
+  nextEdgeId = 1;
+  currentValves = [];
+  currentViaNodeIds = [];
+  selectedNodeId = null;
+  selectedEdgeId = null;
+  draggingNode = null;
+  updateDeleteEdgeBtn();
+  renderValveTags();
+  renderViaNodeTags();
+  renderNodeList();
+  updateNodeSelectors();
+  renderEdgeList();
+  updateSummary();
+  redrawCanvas();
+  localStorage.removeItem('pipingToolData');
+  showToast('全データを削除しました');
+  renderUxHints();
+  maybeRecalcWorkEstimate();
+}
+
+// ===== TABS =====
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tabId));
+  if (tabId === 'summary') updateSummary();
+  if (tabId === 'edges') renderEdgeList();
+  if (tabId === 'work') recalcWorkEstimate();
+}
+
+// ===== KEYBOARD =====
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.key === 'z') {
+    e.preventDefault();
+    undoLastEdge();
+  }
+});
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ===== UX HINTS (stepper, state bar, handoff badge) =====
+function renderWorkflowSteps() {
+  let active;
+  if (!imageLoaded) active = 1;
+  else if (nodes.length === 0) active = 2;
+  else if (edges.length === 0) active = 3;
+  else active = 4;
+  document.querySelectorAll('#workflowSteps .step').forEach(el => {
+    el.classList.toggle('active', parseInt(el.dataset.step, 10) === active);
+  });
+}
+
+function renderStateBar() {
+  document.getElementById('stateNodes').textContent = nodes.length;
+  document.getElementById('stateEdges').textContent = edges.length;
+  const latestEl = document.getElementById('stateLatest');
+  const hintEl = document.getElementById('stateHint');
+  if (edges.length === 0) {
+    latestEl.textContent = '—';
+  } else {
+    const last = edges[edges.length - 1];
+    const fromN = nodes.find(n => n.id === last.fromNode);
+    const toN = nodes.find(n => n.id === last.toNode);
+    const fromLbl = fromN ? fromN.label : '?';
+    const toLbl = toN ? toN.label : '?';
+    latestEl.textContent = `${fromLbl} → ${toLbl} (${last.length}m)`;
+  }
+  let hint;
+  if (!imageLoaded) hint = '次にやること: 図面を読み込んでください';
+  else if (nodes.length === 0) hint = '次にやること: 図面をクリックしてノードを配置';
+  else if (edges.length === 0) hint = '次にやること: 左で始点・終点・長さを入れて『区間を確定 →』';
+  else hint = '次にやること: 区間を続けて登録するか「出力」タブで CSV をダウンロード';
+  hintEl.textContent = hint;
+}
+
+function renderUxHints() {
+  renderWorkflowSteps();
+  renderStateBar();
+}
+
+function showHandoffBadge() {
+  const b = document.getElementById('from-handoff-badge');
+  if (b) b.hidden = false;
+}
+function hideHandoffBadge() {
+  const b = document.getElementById('from-handoff-badge');
+  if (b) b.hidden = true;
+}
+
+// ===== RESIZABLE DIVIDER =====
+(function() {
+  const divider = document.getElementById('divider');
+  const leftPane = document.querySelector('.left-pane');
+  const app = document.querySelector('.app');
+  let isDragging = false;
+
+  divider.addEventListener('mousedown', function(e) {
+    isDragging = true;
+    divider.classList.add('active');
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    const appRect = app.getBoundingClientRect();
+    const newWidth = e.clientX - appRect.left;
+    const minW = 280;
+    const maxW = appRect.width * 0.8;
+    if (newWidth >= minW && newWidth <= maxW) {
+      leftPane.style.width = newWidth + 'px';
+    }
+  });
+
+  document.addEventListener('mouseup', function() {
+    if (isDragging) {
+      isDragging = false;
+      divider.classList.remove('active');
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+  });
+
+  // Touch support (tablet)
+  divider.addEventListener('touchstart', function(e) {
+    isDragging = true;
+    divider.classList.add('active');
+    e.preventDefault();
+  }, { passive: false });
+
+  document.addEventListener('touchmove', function(e) {
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    const appRect = app.getBoundingClientRect();
+    const newWidth = touch.clientX - appRect.left;
+    const minW = 280;
+    const maxW = appRect.width * 0.8;
+    if (newWidth >= minW && newWidth <= maxW) {
+      leftPane.style.width = newWidth + 'px';
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchend', function() {
+    if (isDragging) {
+      isDragging = false;
+      divider.classList.remove('active');
+    }
+  });
+})();
+
+// ===== ZOOM & PAN (wheel + pinch) =====
+// Mac trackpad: pinch sends wheel with ctrlKey=true → ZOOM
+// Mac trackpad: 2-finger swipe sends wheel with ctrlKey=false → PAN (scroll)
+// Windows: Ctrl+wheel → ZOOM, plain wheel → vertical scroll (PAN)
+canvasWrap.addEventListener('wheel', function(e) {
+  if (e.ctrlKey || e.metaKey) {
+    // ===== PINCH / CTRL+WHEEL → ZOOM =====
+    e.preventDefault();
+    const delta = -e.deltaY * 0.01;
+    const newZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoomLevel + delta));
+    if (newZoom !== zoomLevel) {
+      const rect = canvasWrap.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left + canvasWrap.scrollLeft;
+      const mouseY = e.clientY - rect.top + canvasWrap.scrollTop;
+      const ratio = newZoom / zoomLevel;
+      zoomLevel = newZoom;
+      applyZoom();
+      canvasWrap.scrollLeft = mouseX * ratio - (e.clientX - rect.left);
+      canvasWrap.scrollTop = mouseY * ratio - (e.clientY - rect.top);
+    }
+  } else {
+    // ===== 2-FINGER SWIPE / PLAIN WHEEL → PAN =====
+    // Let the browser handle native scrolling on the overflow:auto container
+    // No preventDefault — the canvasWrap's overflow:auto does the work
+  }
+}, { passive: false });
+
+// Prevent Safari gesture-based zoom on the canvas area
+canvasWrap.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
+canvasWrap.addEventListener('gesturechange', function(e) {
+  e.preventDefault();
+  // Safari sends scale in e.scale for pinch
+  const newZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoomLevel * e.scale));
+  if (newZoom !== zoomLevel) {
+    zoomLevel = newZoom;
+    applyZoom();
+  }
+}, { passive: false });
+
+// Delete / Backspace → delete the currently selected edge.
+// Skipped when the user is typing in an input / select / textarea so
+// label editing, length entry, etc. are not hijacked.
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+  if (selectedEdgeId == null) return;
+  const ae = document.activeElement;
+  if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT' || ae.isContentEditable)) return;
+  e.preventDefault();
+  deleteSelectedEdge();
+});
+
+// ESC: cancel scale picking, or cancel pending node placement (whichever is active).
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Escape') return;
+  if (scalePickingMode) {
+    e.preventDefault();
+    cancelScalePick();
+    return;
+  }
+  if (pendingNodePlacement) {
+    e.preventDefault();
+    cancelPendingNodePlacement();
+  }
+});
+
+// ===== INIT =====
+loadScaleFromStorage();
+loadFromStorage();
+loadWorkEstimate();
+renderWorkEstimateMasters();
+renderNodeList();
+document.getElementById('edge-from').addEventListener('change', function() {
+  hideHandoffBadge();
+  updateAutoLenBtn();
+  renderViaNodeTags();
+});
+document.getElementById('edge-to').addEventListener('change', function() {
+  updateAutoLenBtn();
+  renderViaNodeTags();
+});
+renderUxHints();
+updateDeleteEdgeBtn();
+updateScaleUi();
+updateAutoLenBtn();
+</script>
+</body>
+</html>
