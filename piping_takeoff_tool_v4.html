@@ -233,6 +233,10 @@ td .actions { display: flex; gap: 4px; }
 .we-table td.num-cell { text-align: right; font-variant-numeric: tabular-nums; }
 .we-table .we-total-row td { font-weight: 700; background: var(--bg-soft, #f8fafc); border-top: 2px solid var(--border, #e2e8f0); }
 .we-table .we-support-auto { color: var(--text-muted, #64748b); font-size: 11px; margin-left: 4px; }
+.we-table .we-support-add { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; font-size: 11px; color: var(--text-muted, #64748b); }
+.we-table .we-support-add input[type="number"] { width: 48px; }
+.we-table .we-support-qty { font-weight: 700; }
+.we-table .we-support-qty small { display: block; font-weight: 400; font-size: 11px; color: var(--text-muted, #64748b); }
 .we-actions { margin-top: 6px; display: flex; justify-content: flex-end; }
 </style>
 </head>
@@ -316,7 +320,7 @@ td .actions { display: flex; gap: 4px; }
             </div>
             <div class="form-group">
               <label>系統 <span class="badge">保持</span></label>
-              <input type="text" id="edge-system" value="ガス配管">
+              <input type="text" id="edge-system" value="水道配管">
             </div>
             <div class="form-group">
               <label>管種 <span class="badge">保持</span></label>
@@ -530,8 +534,8 @@ td .actions { display: flex; gap: 4px; }
                   <td class="num-cell"><input type="number" step="1" min="0" data-field="unitPrice" data-key="anchor" onchange="onWorkEstimateInputChange()"></td>
                 </tr>
                 <tr data-key="support">
-                  <td>支持台固定<span class="we-support-auto" id="weSupportAuto">（自動: 0 台）</span></td>
-                  <td class="num-cell"><input type="number" step="1" min="0" data-field="additionalQty" data-key="support" placeholder="追加分" onchange="onWorkEstimateInputChange()"></td>
+                  <td>支持台固定<span class="we-support-add">＋追加 <input type="number" step="1" min="0" data-field="additionalQty" data-key="support" placeholder="0" onchange="onWorkEstimateInputChange()"> 台</span></td>
+                  <td class="num-cell"><span class="we-support-qty" id="weSupportQty">—</span></td>
                   <td>台</td>
                   <td class="num-cell"><input type="number" step="1" min="0" data-field="baseMin" data-key="support" onchange="onWorkEstimateInputChange()"></td>
                   <td class="num-cell"><input type="number" step="1" min="0" data-field="unitPrice" data-key="support" onchange="onWorkEstimateInputChange()"></td>
@@ -2307,8 +2311,12 @@ function recalcWorkEstimate() {
   if (!body) return;
   readWorkEstimateInputs();
   const { rows, supportAuto } = computeWorkEstimateRows();
-  const auto = document.getElementById('weSupportAuto');
-  if (auto) auto.textContent = '（自動: ' + supportAuto + ' 台）';
+  const addl = workEstimate.auxWorkTable.support.additionalQty || 0;
+  const qtyEl = document.getElementById('weSupportQty');
+  if (qtyEl) {
+    qtyEl.innerHTML = (supportAuto + addl) +
+      '<small>自動 ' + supportAuto + (addl ? ' ＋追加 ' + addl : '') + '</small>';
+  }
   body.innerHTML = '';
   let totalMinutes = 0, totalManDay = 0, totalCost = 0;
   rows.forEach(r => {

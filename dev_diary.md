@@ -1,5 +1,34 @@
 # 開発日誌
 
+## 2026-06-17 — 配管拾いツール v4 微修正（支援最終日前の調整）
+
+渡邉設備のヒアリングを反映し、v4 の「作業見積」タブ周りを 2 点だけ最小変更で調整。`piping_takeoff_tool_v4.html` のみ変更（nodes / edges 構造・CSV 列名は不変）。
+
+### 1. 区間登録「系統（保持）」のデフォルトを変更
+
+- 渡邉設備はガス工事をほとんど扱わないため、`edge-system` の初期値を `ガス配管` → `水道配管` に変更。
+- この欄は「保持」仕様（送信後リセットされない）のため、初期値を決めるのは HTML の `value` 属性のみ。JS 側のリセット処理は無し。
+
+### 2. 付帯作業「支持台固定」の数量表示を改善
+
+- 症状：計算ロジック（`computeWorkEstimateRows` の `supportAuto = Math.ceil(totalLen)`）は正しく自動算出していたが、付帯作業カードの「数量」欄に入っていた input は `additionalQty`（＝追加分のみ、デフォルト 0）で、自動算出値はラベル横の小さなグレー文字でしか出ず、「数量＝0 で手入力」に見えていた。
+- 対応：
+  - 数量欄を input から読み取り専用 `<span id="weSupportQty">` に変更し、**自動算出の合計（自動＋追加）** を表示。サブテキストで `自動 N（＋追加 M）` の内訳も併記。
+  - 追加分の input（`data-field="additionalQty"`）は残したままラベルセル内へ「＋追加 [ ] 台」として明示移設。`#weAuxTable` 内に留めるため `readWorkEstimateInputs` / `renderWorkEstimateMasters` の `input[data-field]` 走査は従来通り機能。
+  - 旧 `id="weSupportAuto"` のグレー文字 span は役割を数量欄へ移したため撤去。`recalcWorkEstimate` の代入先を `weSupportQty` に差し替え。
+  - CSS：`.we-support-add` / `.we-support-qty` を追加（追加入力は幅 48px、数量は太字＋内訳サブテキスト）。
+- データ構造・保存仕様は不変（`additionalQty` キー、localStorage `pipingWorkEstimate`。追加分のみ保存、自動分は表示時に再算出）。
+
+### ブラウザでの実機確認（実施済み）
+
+CLAUDE.md「§9 確認ルール」に従い、headless Chromium で実ページを操作して確認：
+
+- 6.25m 分の区間で作業見積タブを開く → 数量欄に `7（自動 7）` を表示（手入力欄ではなく read-only span）。
+- 追加分に 2 を入力 → 数量欄 `9（自動 7 ＋追加 2）`、プレビューの支持台固定行も 9 台 / 27,000 円に連動。
+- リロード後も追加分（2）が `pipingWorkEstimate` に保持され、自動分は再算出。console エラーなし。
+
+---
+
 ## 2026-05-20 — 配管拾いツール v4 リリース ＋ 渡邉設備 LP v2
 
 ヒアリング結果を反映した 2 ファイルを新規バージョンとして追加。既存 v3.1 / v1 LP は保全し、追加ベースで対応。
